@@ -26,7 +26,7 @@ mkdir -p $DIR/bins
 pushd $DIR/bins/
 
 # Install tools needed for packaging
-apt-get -y install git rubygems make pbuilder python-mock python-configobj python-support cdbs python-all-dev python-stdeb libmysqlclient-dev libldap2-dev
+apt-get -y install git php-pear rubygems make pbuilder python-mock python-configobj python-support cdbs python-all-dev python-stdeb libmysqlclient-dev libldap2-dev
 if [ -z `gem list --local fpm | grep fpm | cut -f1 -d" "` ]; then
   gem install fpm --no-ri --no-rdoc
 fi
@@ -71,6 +71,28 @@ for i in elasticsearch tail-multiline tail-ex record-reformer rewrite; do
     fi
     FILES="fluent-plugin-${i}.gem $FILES"
 done
+
+# Build scalr bundle
+if [ ! -f scalr.tgz ]; then
+    git clone https://github.com/pchandra/scalr scalr
+    tar czf scalr.tgz scalr
+    rm -rf scalr
+fi
+FILES="scalr.tgz $FILES"
+
+# Grab pecl packages bundle
+if [ ! -f pecl-rrd.tgz ]; then
+    pecl download rrd
+    mv rrd-*.tgz pecl-rrd.tgz
+fi
+FILES="pecl-rrd.tgz $FILES"
+
+# Grab pecl packages bundle
+if [ ! -f pecl-http.tgz ]; then
+    pecl download pecl_http
+    mv pecl_http-*.tgz pecl-http.tgz
+fi
+FILES="pecl-http.tgz $FILES"
 
 # Fetch the cirros image for testing
 if [ ! -f cirros-0.3.2-x86_64-disk.img ]; then
@@ -137,6 +159,15 @@ if [ ! -f elasticsearch-plugins.tgz ]; then
 fi
 FILES="elasticsearch-plugins.tgz $FILES"
 
+<<<<<<< HEAD
+=======
+# Snag logstash
+if [ ! -f logstash-1.1.13-flatjar.jar ]; then
+    $CURL -O -L https://logstash.objects.dreamhost.com/release/logstash-1.1.13-flatjar.jar
+fi
+FILES="logstash-1.1.13-flatjar.jar $FILES"
+
+>>>>>>> setup scalr version 4.1.0
 # Fetch pyrabbit
 if [ ! -f pyrabbit-1.0.1.tar.gz ]; then
     $CURL -O -L https://pypi.python.org/packages/source/p/pyrabbit/pyrabbit-1.0.1.tar.gz

@@ -146,6 +146,7 @@ default['bcpc']['ceilometer_dbname'] = "ceilometer"
 default['bcpc']['graphite_dbname'] = "graphite"
 default['bcpc']['pdns_dbname'] = "pdns"
 default['bcpc']['zabbix_dbname'] = "zabbix"
+default['bcpc']['scalr_dbname'] = "scalr"
 
 default['bcpc']['admin_tenant'] = "AdminTenant"
 default['bcpc']['admin_role'] = "Admin"
@@ -154,6 +155,8 @@ default['bcpc']['admin_email'] = "admin@localhost.com"
 
 default['bcpc']['zabbix']['user'] = "zabbix"
 default['bcpc']['zabbix']['group'] = "adm"
+default['bcpc']['scalr']['user'] = "scalr"
+default['bcpc']['scalr']['group'] = "www-data"
 
 default[:bcpc][:ports][:apache][:radosgw] = 8080
 default[:bcpc][:ports][:apache][:radosgw_https] = 8443

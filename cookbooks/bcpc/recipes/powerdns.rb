@@ -381,7 +381,7 @@ get_all_nodes.each do |server|
     end
 end
 
-%w{openstack kibana graphite zabbix}.each do |static|
+%w{openstack kibana graphite zabbix scalr}.each do |static|
     ruby_block "create-management-dns-entry-#{static}" do
         block do
             system "mysql -uroot -p#{get_config('mysql-root-password')} #{node[:bcpc][:pdns_dbname]} -e 'SELECT name FROM records_static' | grep -q \"#{static}.#{node[:bcpc][:domain_name]}\""
