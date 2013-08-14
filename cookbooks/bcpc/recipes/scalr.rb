@@ -58,12 +58,6 @@ bash "install-scalr-server" do
     not_if "test -d /opt/scalr"
 end
 
-file "/opt/scalr/app/etc/.cryptokey" do
-    owner node[:bcpc][:scalr][:user]
-    group node[:bcpc][:scalr][:group]
-    mode 02775
-end
-
 template "/opt/scalr/app/etc/id" do
     source "scalr-id.erb"
     owner node[:bcpc][:scalr][:user]
@@ -77,16 +71,16 @@ directory "/opt/scalr/app/cache" do
     mode 02775
 end
 
-%w{graphics rrddata log}.each do |pkg|
-    directory "/opt/scalr/#{pkg}" do
+%w{graphics log app/rrd app/rrd/x1x6 app/rrd/x2x7 app/rrd/x3x8 app/rrd/x4x9 app/rrd/x5x0}.each do |dir|
+    directory "/opt/scalr/#{dir}" do
         owner node[:bcpc][:scalr][:user]
         group node[:bcpc][:scalr][:group]
         mode 0755
     end
 end
 
-template "/opt/scalr/app/etc/config.ini" do
-    source "scalr-config.ini.erb"
+template "/opt/scalr/app/etc/config.yml" do
+    source "scalr-config.yml.erb"
     owner node[:bcpc][:scalr][:user]
     group node[:bcpc][:scalr][:group]
     mode 0640
@@ -108,7 +102,16 @@ ruby_block "scalr-database-creation" do
     end
 end
 
-%w{rrd http}.each do |pkg|
+bash "install-scalr-python" do
+    code <<-EOH
+        cd /opt/scalr/app/python
+        python setup.py install
+        touch setup.py.installed
+    EOH
+    not_if "test -f /opt/scalr/app/python/setup.py.installed"
+end
+
+%w{rrd http yaml}.each do |pkg|
     cookbook_file "/tmp/pecl-#{pkg}.tgz" do
         source "bins/pecl-#{pkg}.tgz"
         owner "root"

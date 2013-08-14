@@ -4,22 +4,21 @@
 #
 ################################################
 
-* * * * *  scalr /usr/local/bin/if_vip /usr/bin/php  /opt/scalr/app/cron/cron.php --Scheduler >> /opt/scalr/log/scheduler.log 2>&1
-* * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron/cron.php --DNSManagerPoll >> /opt/scalr/log/dnsmanagerpoll.log 2>&1
-* * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron/cron.php --DBQueueEvent >> /opt/scalr/log/dbqueueevent.log 2>&1
-*/2 * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron/cron.php --SzrMessaging >> /opt/scalr/log/szrmessaging.log 2>&1
-*/2 * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron/cron.php --BundleTasksManager >> /opt/scalr/log/bundletasksmanager.log 2>&1
-*/2 * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron/cron.php --UsageStatsPoller >> /opt/scalr/log/usagestatspoller.log 2>&1
-*/2 * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron/cron.php --EBSManager >> /opt/scalr/log/ebsmanager.log 2>&1
-*/4 * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron/cron.php --RDSMaintenance >> /opt/scalr/log/rdsmaintenance.log 2>&1
-*/10 * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron/cron.php  --MySQLMaintenance >> /opt/scalr/log/mysqlmaintenance.log 2>&1
-*/20 * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron/cron.php --RolesQueue >> /opt/scalr/log/rolesqueue.log 2>&1
-17 5 * * * scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron/cron.php --RotateLogs >> /opt/scalr/log/rotatelogs.log 2>&1
+* * * * * scalr    /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron/cron.php --Scheduler >> /opt/scalr/log/scheduler.log 2>&1
+*/5 * * * * scalr  /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron/cron.php --UsageStatsPoller >> /opt/scalr/log/usagestatspoller.log 2>&1
+*/2 * * * * scalr  /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron-ng/cron.php --Scaling >> /opt/scalr/log/scaling.log 2>&1
+* * * * * scalr    /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron/cron.php --DBQueueEvent >> /opt/scalr/log/dbqueueevent.log 2>&1
+*/2 * * * * scalr  /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron/cron.php --SzrMessaging >> /opt/scalr/log/szrmessaging.log 2>&1
+*/2 * * * * scalr  /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron/cron.php --BundleTasksManager >> /opt/scalr/log/bundletasksmanager.log 2>&1
+*/2 * * * * scalr  /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron-ng/cron.php --DeployManager >> /opt/scalr/log/deploymanager.log 2>&1
+*/15 * * * * scalr /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron-ng/cron.php --MetricCheck >> /opt/scalr/log/metriccheck.log 2>&1
+*/2 * * * * scalr  /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron-ng/cron.php --Poller >> /opt/scalr/log/poller.log 2>&1
+*/10 * * * * scalr /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron/cron.php --MySQLMaintenance >> /opt/scalr/log/mysqlmaintenance.log 2>&1
+* * * * * scalr    /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron/cron.php --DNSManagerPoll >> /opt/scalr/log/dnsmanagerpoll.log 2>&1
+17 5 * * * scalr   /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron/cron.php --RotateLogs >> /opt/scalr/log/rotatelogs.log 2>&1
+*/2 * * * * scalr  /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron/cron.php --EBSManager >> /opt/scalr/log/ebsmanager.log 2>&1
+*/20 * * * * scalr /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron/cron.php --RolesQueue >> /opt/scalr/log/rolesqueue.log 2>&1
+*/5 * * * * scalr  /usr/local/bin/if_vip /usr/bin/php -q /opt/scalr/app/cron-ng/cron.php --DbMsrMaintenance >> /opt/scalr/log/dbmsrmaintenance.log 2>&1
 
-* * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron-ng/cron.php --ScalarizrMessaging >> /opt/scalr/log/scalarizrmessaging.log 2>&1
-* * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron-ng/cron.php --MessagingQueue >> /opt/scalr/log/messagingqueue.log 2>&1
-* * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron-ng/cron.php --SNMPStatsPoller >> /opt/scalr/log/snmpstatspoller.log 2>&1
-*/2 * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron-ng/cron.php --DeployManager >> /opt/scalr/log/deploymanager.log 2>&1
-*/2 * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron-ng/cron.php --Poller >> /opt/scalr/log/poller.log 2>&1
-*/2 * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron-ng/cron.php --Scaling >> /opt/scalr/log/scaling.log 2>&1
-*/5 * * * *  scalr /usr/local/bin/if_vip /usr/bin/php   /opt/scalr/app/cron-ng/cron.php --DbMsrMaintenance >> /opt/scalr/log/dbmsrmaintenance.log 2>&1
+*/5 * * * * scalr  /usr/local/bin/if_vip python -m scalrpy.stats_poller -c /opt/scalr/app/etc/config.yml -i 120 --start >> /opt/scalr/log/statspoller.log 2>&1
+*/5 * * * * scalr  /usr/local/bin/if_vip python -m scalrpy.messaging -c /opt/scalr/app/etc/config.yml --start >> /opt/scalr/log/messaging.log 2>&1

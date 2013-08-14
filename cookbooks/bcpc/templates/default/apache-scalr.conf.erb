@@ -12,15 +12,12 @@ NameVirtualHost <%="#{node[:bcpc][:management][:ip]}"%>:443
     ErrorLog ${APACHE_LOG_DIR}/scalr-error.log
     CustomLog ${APACHE_LOG_DIR}/scalr-access.log combined
     <Directory /opt/scalr/app/www>
-        Options Indexes FollowSymLinks MultiViews
+        Options -Indexes FollowSymLinks MultiViews
         AllowOverride All
+        Order allow,deny
+        allow from all
     </Directory>
     Alias /graphics "/opt/scalr/graphics"
-
-    <Directory /opt/scalr/app/www>
-        Options Indexes FollowSymLinks MultiViews
-        AllowOverride All
-    </Directory>
 
     SSLEngine on
     SSLCertificateFile /etc/ssl/certs/ssl-bcpc.pem

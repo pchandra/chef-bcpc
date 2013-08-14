@@ -74,25 +74,35 @@ done
 
 # Build scalr bundle
 if [ ! -f scalr.tgz ]; then
-    git clone https://github.com/pchandra/scalr scalr
+    git clone https://github.com/Scalr/scalr scalr
+    cd scalr
+    git checkout 4.4.0-RELEASE
+    cd ..
     tar czf scalr.tgz scalr
     rm -rf scalr
 fi
 FILES="scalr.tgz $FILES"
 
-# Grab pecl packages bundle
+# Grab pecl rrd bundle
 if [ ! -f pecl-rrd.tgz ]; then
     pecl download rrd
     mv rrd-*.tgz pecl-rrd.tgz
 fi
 FILES="pecl-rrd.tgz $FILES"
 
-# Grab pecl packages bundle
+# Grab pecl http bundle
 if [ ! -f pecl-http.tgz ]; then
     pecl download pecl_http
     mv pecl_http-*.tgz pecl-http.tgz
 fi
 FILES="pecl-http.tgz $FILES"
+
+# Grab pecl yaml bundle
+if [ ! -f pecl-yaml.tgz ]; then
+    pecl download yaml
+    mv yaml-*.tgz pecl-yaml.tgz
+fi
+FILES="pecl-yaml.tgz $FILES"
 
 # Fetch the cirros image for testing
 if [ ! -f cirros-0.3.2-x86_64-disk.img ]; then
