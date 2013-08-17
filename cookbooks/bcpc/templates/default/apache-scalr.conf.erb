@@ -4,9 +4,10 @@
 #
 ################################################
 
+Listen <%="#{node[:bcpc][:management][:vip]}"%>:9999
 NameVirtualHost <%="#{node[:bcpc][:management][:ip]}"%>:443
 
-<VirtualHost <%="#{node[:bcpc][:management][:ip]}"%>:443>
+<VirtualHost <%="#{node[:bcpc][:management][:vip]}"%>:9999 <%="#{node[:bcpc][:management][:ip]}"%>:443>
     ServerName "scalr.<%="#{node[:bcpc][:domain_name]}"%>"
     DocumentRoot /opt/scalr/app/www
     ErrorLog ${APACHE_LOG_DIR}/scalr-error.log
