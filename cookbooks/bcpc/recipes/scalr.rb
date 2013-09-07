@@ -26,7 +26,7 @@ ruby_block "initialize-scalr-config" do
         make_config('mysql-scalr-password', secure_password)
         make_config('mysql-phpmyadmin-password', secure_password)
         make_config('scalr-admin-password', secure_password)
-        make_config('scalr-id', secure_password)
+        make_config('scalr-id', 8.times.map{((0..9).to_a + ('a'..'f').to_a)[rand(16)].to_s}.join)
     end
 end
 
