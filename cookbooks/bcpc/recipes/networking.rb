@@ -229,3 +229,4 @@ bash "disable-noninteractive-pam-logging" do
 end
 
 include_recipe "bcpc::apache2"
+include_recipe "bcpc::anycast"

@@ -114,6 +114,7 @@ default['bcpc']['ceph']['rebalance'] = false
 #  Network settings for the cluster
 #
 ###########################################
+default['bcpc']['management']['anycast'] = "10.0.99.1"
 default['bcpc']['management']['vip'] = "10.17.1.15"
 default['bcpc']['management']['netmask'] = "255.255.255.0"
 default['bcpc']['management']['cidr'] = "10.17.1.0/24"
@@ -152,6 +153,10 @@ default['bcpc']['fixed']['dhcp_lease_time'] = "120"
 
 default['bcpc']['ntp_servers'] = ["pool.ntp.org"]
 default['bcpc']['dns_servers'] = ["8.8.8.8", "8.8.4.4"]
+
+default['bcpc']['bgp']['asn'] = 64555
+default['bcpc']['bgp']['peer_asn'] = 65000
+default['bcpc']['bgp']['peer_ip'] = "192.168.43.2"
 
 ###########################################
 #
