@@ -26,7 +26,7 @@ mkdir -p $DIR/bins
 pushd $DIR/bins/
 
 # Install tools needed for packaging
-apt-get -y install git rubygems make pbuilder python-mock python-configobj python-support cdbs python-all-dev python-stdeb libmysqlclient-dev libldap2-dev
+apt-get -y install git rubygems make pbuilder python-mock python-configobj python-support cdbs python-all-dev python-stdeb libmysqlclient-dev libldap2-dev scons wget patch unzip flex bison gcc g++ libssl-dev autoconf automake libtool pkg-config vim python-setuptools python-lxml
 if [ -z `gem list --local fpm | grep fpm | cut -f1 -d" "` ]; then
   gem install fpm --no-ri --no-rdoc
 fi
@@ -180,6 +180,69 @@ if [ ! -f zabbix-agent.tar.gz ] || [ ! -f zabbix-server.tar.gz ]; then
     rm -rf zabbix-2.2.2 zabbix-2.2.2.tar.gz
 fi
 FILES="zabbix-agent.tar.gz zabbix-server.tar.gz $FILES"
+
+# Build the packages for installing OpenContrail
+if [ ! -f contrail-*.deb ]; then
+    mkdir -p contrail
+    cd contrail
+    # Get the git-repo extension to git
+    $CURL -L -O http://commondatastorage.googleapis.com/git-repo-downloads/repo
+    chmod +x repo
+    # Permanently add the github host key to avoid failures on checkout
+    ssh -o 'StrictHostKeyChecking no' github.com || true
+    # Get the meta-repo and then pull all the source
+    ./repo init -u git@github.com:Juniper/contrail-vnc < /dev/null
+    ./repo sync
+    # Fetch build dependencies for OpenContrail
+    python third_party/fetch_packages.py
+    # Now build the debian packages
+    mkdir -p build/packages
+    cp -R tools/packages/debian/contrail/debian build/packages
+    chmod +x build/packages/debian/rules
+    cd build/packages
+    fakeroot debian/rules binary
+    # Collect the debs we just built
+    cd ..
+    for i in *.deb; do
+        BASE=${i/_*/}
+        mv $i ${BASE}.deb
+    done
+    cp *.deb ../../
+    cd ../..
+    rm -rf contrail
+fi
+
+# Build a bunch of python debs that are OpenContrail dependencies
+for i in https://pypi.python.org/packages/source/b/backports.ssl_match_hostname/backports.ssl_match_hostname-3.4.0.2.tar.gz \
+         https://pypi.python.org/packages/source/b/bitarray/bitarray-0.8.1.tar.gz \
+         https://pypi.python.org/packages/source/b/bottle/bottle-0.12.5.tar.gz \
+         https://pypi.python.org/packages/source/c/certifi/certifi-1.0.1.tar.gz \
+         https://pypi.python.org/packages/source/g/geventhttpclient/geventhttpclient-1.1.0.tar.gz \
+         https://pypi.python.org/packages/source/k/kazoo/kazoo-1.3.1.zip \
+         https://pypi.python.org/packages/source/n/ncclient/ncclient-0.4.1.tar.gz \
+         https://pypi.python.org/packages/source/p/pycassa/pycassa-1.11.0.tar.gz \
+         https://pypi.python.org/packages/source/r/requests/requests-2.2.1.tar.gz \
+         https://pypi.python.org/packages/source/s/stevedore/stevedore-0.15.tar.gz \
+         https://pypi.python.org/packages/source/t/thrift/thrift-0.9.1.tar.gz \
+         https://pypi.python.org/packages/source/X/XML2Dict/XML2Dict-0.2.1.tar.gz; do
+    # Setup some variables and assume it's a tarball unless it ends in .zip
+    UNCOMPRESS="tar zxf"
+    if [[ $i == *.zip ]]; then UNCOMPRESS="unzip"; fi
+    FILE=`basename $i`
+    BASE=${FILE/-*/}
+    if [ ! -f python-${BASE}.deb ]; then
+        # Grab the file and uncompress it
+        $CURL -L -O $i
+        $UNCOMPRESS $FILE
+        cd ${BASE}*
+        touch README.md
+        rm -rf debian
+        python setup.py --command-packages=stdeb.command bdist_deb
+        cp deb_dist/python-*.deb ../python-${BASE}.deb
+        cd ..
+        rm -rf ${BASE}*
+    fi
+done
 
 # Get some python libs 
 if [ ! -f python-requests-aws_0.1.5_all.deb ]; then
