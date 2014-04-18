@@ -26,7 +26,41 @@ mkdir -p $DIR/bins
 pushd $DIR/bins/
 
 # Install tools needed for packaging
-apt-get -y install git rubygems make pbuilder python-mock python-configobj python-support cdbs python-all-dev python-stdeb libmysqlclient-dev libldap2-dev scons wget patch unzip flex bison gcc g++ libssl-dev autoconf automake libtool pkg-config vim python-setuptools python-lxml quilt openjdk-6-jdk javahelper ant libhttpcore-java liblog4j1.2-java libcommons-codec-java
+apt-get -y install git \
+                   rubygems \
+                   make \
+                   pbuilder \
+                   python-mock \
+                   python-configobj \
+                   python-support \
+                   cdbs \
+                   python-all-dev \
+                   python-stdeb \
+                   libmysqlclient-dev \
+                   libldap2-dev \
+                   scons \
+                   wget \
+                   patch \
+                   unzip \
+                   flex \
+                   bison \
+                   gcc \
+                   g++ \
+                   libssl-dev \
+                   autoconf \
+                   automake \
+                   libtool \
+                   pkg-config \
+                   vim \
+                   python-setuptools \
+                   python-lxml \
+                   quilt \
+                   openjdk-6-jdk \
+                   javahelper \
+                   ant \
+                   libhttpcore-java \
+                   liblog4j1.2-java \
+                   libcommons-codec-java
 if [ -z `gem list --local fpm | grep fpm | cut -f1 -d" "` ]; then
   gem install fpm --no-ri --no-rdoc
 fi
