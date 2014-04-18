@@ -26,7 +26,7 @@ mkdir -p $DIR/bins
 pushd $DIR/bins/
 
 # Install tools needed for packaging
-apt-get -y install git rubygems make pbuilder python-mock python-configobj python-support cdbs python-all-dev python-stdeb libmysqlclient-dev libldap2-dev scons wget patch unzip flex bison gcc g++ libssl-dev autoconf automake libtool pkg-config vim python-setuptools python-lxml
+apt-get -y install git rubygems make pbuilder python-mock python-configobj python-support cdbs python-all-dev python-stdeb libmysqlclient-dev libldap2-dev scons wget patch unzip flex bison gcc g++ libssl-dev autoconf automake libtool pkg-config vim python-setuptools python-lxml quilt openjdk-6-jdk javahelper ant libhttpcore-java liblog4j1.2-java libcommons-codec-java
 if [ -z `gem list --local fpm | grep fpm | cut -f1 -d" "` ]; then
   gem install fpm --no-ri --no-rdoc
 fi
@@ -182,8 +182,8 @@ fi
 FILES="zabbix-agent.tar.gz zabbix-server.tar.gz $FILES"
 
 # Build the packages for installing OpenContrail
-if [ ! -f contrail-*.deb ]; then
-    mkdir -p contrail
+if [ ! -f opencontrail-*.deb ]; then
+    rm -rf contrail && mkdir -p contrail
     cd contrail
     # Get the git-repo extension to git
     $CURL -L -O http://commondatastorage.googleapis.com/git-repo-downloads/repo
@@ -197,10 +197,20 @@ if [ ! -f contrail-*.deb ]; then
     python third_party/fetch_packages.py
     # Now build the debian packages
     mkdir -p build/packages
-    cp -R tools/packages/debian/contrail/debian build/packages
-    chmod +x build/packages/debian/rules
+    cp -R tools/packages/debian/opencontrail/debian build/packages
     cd build/packages
+    chmod +x debian/rules
     fakeroot debian/rules binary
+    for i in ifmap-python-client ifmap-server; do
+        mkdir -p $i
+        cp -R ../../tools/packages/debian/$i/debian $i
+        cd $i
+        chmod +x debian/rules
+        fakeroot debian/rules get-orig-source
+        fakeroot debian/rules binary
+        cd ..
+        mv ${i}*.deb ../
+    done
     # Collect the debs we just built
     cd ..
     for i in *.deb; do
