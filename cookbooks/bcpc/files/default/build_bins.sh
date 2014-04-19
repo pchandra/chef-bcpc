@@ -241,6 +241,26 @@ if [ ! -f opencontrail-*.deb ]; then
     rm -rf contrail
 fi
 
+# Build the neutron packages that have the opencontrail plugin
+if [ ! -f neutron-*.deb ]; then
+    rm -rf neutron
+    git clone -b packages https://github.com/pchandra/neutron
+    cd neutron
+    python setup.py --command-packages=stdeb.command sdist_dsc
+    rm -rf deb_dist/neutron-2013.2/debian
+    cp -R debian deb_dist/neutron-2013.2/
+    cd deb_dist/neutron-2013.2/
+    fakeroot debian/rules binary
+    cd ..
+    for i in *.deb; do
+        BASE=${i/_*/}
+        mv $i ${BASE}.deb
+    done
+    cp *.deb ../../
+    cd ../../
+    rm -rf neutron
+fi
+
 # Build a bunch of python debs that are OpenContrail dependencies
 for i in https://pypi.python.org/packages/source/b/backports.ssl_match_hostname/backports.ssl_match_hostname-3.4.0.2.tar.gz \
          https://pypi.python.org/packages/source/b/bitarray/bitarray-0.8.1.tar.gz \
