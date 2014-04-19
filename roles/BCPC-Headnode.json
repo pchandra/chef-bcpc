@@ -31,6 +31,7 @@
       "recipe[bcpc::zabbix-head]",
       "recipe[bcpc::zookeeper]",
       "recipe[bcpc::cassandra]",
+      "recipe[bcpc::redis]",
       "role[BCPC-Worknode]"
     ],
     "description": "A highly-available head node in a BCPC cluster",
