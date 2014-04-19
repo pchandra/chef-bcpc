@@ -230,29 +230,14 @@ if [ ! -f opencontrail-*.deb ]; then
     # Fetch build dependencies for OpenContrail
     python third_party/fetch_packages.py
     # Now build the debian packages
-    mkdir -p build/packages
-    cp -R tools/packages/debian/opencontrail/debian build/packages
+    make -f packages.make
     cd build/packages
-    chmod +x debian/rules
-    fakeroot debian/rules binary
-    for i in ifmap-python-client ifmap-server; do
-        mkdir -p $i
-        cp -R ../../tools/packages/debian/$i/debian $i
-        cd $i
-        chmod +x debian/rules
-        fakeroot debian/rules get-orig-source
-        fakeroot debian/rules binary
-        cd ..
-        mv ${i}*.deb ../
-    done
-    # Collect the debs we just built
-    cd ..
     for i in *.deb; do
         BASE=${i/_*/}
         mv $i ${BASE}.deb
     done
-    cp *.deb ../../
-    cd ../..
+    cp *.deb ../../../
+    cd ../../../
     rm -rf contrail
 fi
 
