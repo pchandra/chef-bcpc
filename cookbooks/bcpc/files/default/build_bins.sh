@@ -263,17 +263,17 @@ fi
 
 # Build a bunch of python debs that are OpenContrail dependencies
 for i in https://pypi.python.org/packages/source/b/backports.ssl_match_hostname/backports.ssl_match_hostname-3.4.0.2.tar.gz \
-         https://pypi.python.org/packages/source/b/bitarray/bitarray-0.8.1.tar.gz \
+         https://pypi.python.org/packages/source/b/bitarray/bitarray-0.8.0.tar.gz \
          https://pypi.python.org/packages/source/b/bottle/bottle-0.12.5.tar.gz \
          https://pypi.python.org/packages/source/c/certifi/certifi-1.0.1.tar.gz \
-         https://pypi.python.org/packages/source/g/geventhttpclient/geventhttpclient-1.1.0.tar.gz \
+         https://pypi.python.org/packages/source/g/geventhttpclient/geventhttpclient-1.0a.tar.gz \
          https://pypi.python.org/packages/source/k/kazoo/kazoo-1.3.1.zip \
          https://pypi.python.org/packages/source/n/ncclient/ncclient-0.4.1.tar.gz \
          https://pypi.python.org/packages/source/p/pycassa/pycassa-1.11.0.tar.gz \
          https://pypi.python.org/packages/source/r/requests/requests-2.2.1.tar.gz \
          https://pypi.python.org/packages/source/s/stevedore/stevedore-0.15.tar.gz \
          https://pypi.python.org/packages/source/t/thrift/thrift-0.9.1.tar.gz \
-         https://pypi.python.org/packages/source/X/XML2Dict/XML2Dict-0.2.1.tar.gz; do
+         https://pypi.python.org/packages/source/x/xmltodict/xmltodict-0.9.0.tar.gz; do
     # Setup some variables and assume it's a tarball unless it ends in .zip
     UNCOMPRESS="tar zxf"
     if [[ $i == *.zip ]]; then UNCOMPRESS="unzip"; fi
