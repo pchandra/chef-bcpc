@@ -80,11 +80,12 @@ end
 
 # For HA, we'll run additional redis-servers in slave mode so that the
 # sentinel processes can agree to shuffle the slave to where they are
-# needed (or promote them to masters) in th event of failures.
-# For this to work, we'll need min_quorum copies which means one master
-# and backups. To do this, we get each headnode's redis slaves to slave
-# to min_quorum-1 machines to the 'right' (wrapping around the Array if
-# needed.
+# needed (or promote them to masters) in the event of failures.
+# For this to work in the event of network partitions, we'll need
+# N/2+1 total depth for each redis partition, which means one master 
+# and N/2 slaves. To do this, we get each headnode's redis slaves to slave
+# to N/2 machines to the 'right' of themselves (wrapping around the Array
+# if needed).
 ips = get_head_nodes.collect{|x| x['bcpc']['management']['ip']}.sort
 offset = ips.index(node['bcpc']['management']['ip']) || 0
 (ips.length/2).times do |count|
