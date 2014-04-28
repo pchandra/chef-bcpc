@@ -19,8 +19,16 @@
 
 include_recipe "bcpc::default"
 
-# Install some of Ubuntu packaged dependencies for the opencontrail
-# packages
+# Install some of Ubuntu packaged dependencies for ifmap-server
+%w{libcommons-codec-java
+   libhttpcore-java
+   liblog4j1.2-java}.each do |pkg|
+    package "#{pkg}" do
+        action :upgrade
+    end
+end
+
+# Install some of Ubuntu packaged dependencies for opencontrail-config
 %w{libzookeeper-mt2 
    python-kombu
    python-zope.interface
@@ -28,8 +36,7 @@ include_recipe "bcpc::default"
    python-gevent
    python-netaddr
    python-netifaces
-   python-psutil
-   python-zookeeper}.each do |pkg|
+   python-psutil}.each do |pkg|
     package "#{pkg}" do
         action :upgrade
     end
@@ -48,6 +55,7 @@ end
    requests
    stevedore
    xmltodict
+   zc
    opencontrail}.each do |pkg|
     cookbook_file "/tmp/python-#{pkg}.deb" do
         source "bins/python-#{pkg}.deb"
@@ -61,16 +69,43 @@ end
     end
 end 
 
-cookbook_file "/tmp/opencontrail-config.deb" do
-    source "bins/opencontrail-config.deb"
+# Install the package to fix-up python-zookeeper dependencies
+cookbook_file "/tmp/bcpc-dependency-fix.deb" do
+    source "bins/bcpc-dependency-fix.deb"
     owner "root"
     mode 00444
 end
-
-package "opencontrail-config" do
+package "bcpc-dependency-fix" do
     provider Chef::Provider::Package::Dpkg
-    source "/tmp/opencontrail-config.deb"
+    source "/tmp/bcpc-dependency-fix.deb"
     action :install
+end
+
+%w{ifmap-python-client
+   ifmap-server
+   opencontrail-config}.each do |pkg|
+    cookbook_file "/tmp/#{pkg}.deb" do
+        source "bins/#{pkg}.deb"
+        owner "root"
+        mode 00444
+    end
+    package "#{pkg}" do
+        provider Chef::Provider::Package::Dpkg
+        source "/tmp/#{pkg}.deb"
+        action :install
+    end
+end
+
+template "/etc/ifmap-server/ifmap.properties" do
+    source "ifmap.properties.erb"
+    mode 00644
+    notifies :restart, "service[ifmap-server]", :delayed
+end
+
+template "/etc/ifmap-server/basicauthusers.properties" do
+    source "ifmap-basicauthusers.properties.erb"
+    mode 00644
+    notifies :restart, "service[ifmap-server]", :immediately
 end
 
 template "/etc/opencontrail/discovery.conf" do
@@ -79,9 +114,32 @@ template "/etc/opencontrail/discovery.conf" do
     group "opencontrail"
     mode 00644
     variables( :servers => get_head_nodes )
-    notifies :restart, "service[opencontrail-discovery]", :delayed
+    notifies :restart, "service[opencontrail-discovery]", :immediately
 end
 
-service "opencontrail-discovery" do
-    action [ :enable, :start ]
+template "/etc/opencontrail/contrail-api.conf" do
+    source "opencontrail-api.conf.erb"
+    owner "opencontrail"
+    group "opencontrail"
+    mode 00640
+    variables( :servers => get_head_nodes )
+    notifies :restart, "service[opencontrail-api]", :immediately
+end
+
+template "/etc/opencontrail/contrail-schema.conf" do
+    source "opencontrail-schema.conf.erb"
+    owner "opencontrail"
+    group "opencontrail"
+    mode 00640
+    variables( :servers => get_head_nodes )
+    notifies :restart, "service[opencontrail-schema]", :immediately
+end
+
+%w{ifmap-server
+   opencontrail-discovery
+   opencontrail-api
+   opencontrail-schema}.each do |pkg|
+    service "#{pkg}" do
+        action [ :enable, :start ]
+    end
 end

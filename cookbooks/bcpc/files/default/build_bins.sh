@@ -60,7 +60,8 @@ apt-get -y install git \
                    ant \
                    libhttpcore-java \
                    liblog4j1.2-java \
-                   libcommons-codec-java
+                   libcommons-codec-java \
+                   equivs
 if [ -z `gem list --local fpm | grep fpm | cut -f1 -d" "` ]; then
   gem install fpm --no-ri --no-rdoc
 fi
@@ -273,7 +274,8 @@ for i in https://pypi.python.org/packages/source/b/backports.ssl_match_hostname/
          https://pypi.python.org/packages/source/r/requests/requests-2.2.1.tar.gz \
          https://pypi.python.org/packages/source/s/stevedore/stevedore-0.15.tar.gz \
          https://pypi.python.org/packages/source/t/thrift/thrift-0.9.1.tar.gz \
-         https://pypi.python.org/packages/source/x/xmltodict/xmltodict-0.9.0.tar.gz; do
+         https://pypi.python.org/packages/source/x/xmltodict/xmltodict-0.9.0.tar.gz \
+         https://pypi.python.org/packages/source/z/zc-zookeeper-static/zc-zookeeper-static-3.4.4.zip; do
     # Setup some variables and assume it's a tarball unless it ends in .zip
     UNCOMPRESS="tar zxf"
     if [[ $i == *.zip ]]; then UNCOMPRESS="unzip"; fi
@@ -292,6 +294,16 @@ for i in https://pypi.python.org/packages/source/b/backports.ssl_match_hostname/
         rm -rf ${BASE}*
     fi
 done
+
+if [ ! -f bcpc-dependency-fix.deb ]; then
+  echo "Package: bcpc-dependency-fix" > bcpc-dependency-fix
+  echo "Depends: python-zc-zookeeper-static" >> bcpc-dependency-fix
+  echo "Provides: python-zookeeper" >> bcpc-dependency-fix
+  echo "Description: Work-around for python-zookeeper dependencies" >> bcpc-dependency-fix
+  equivs-build bcpc-dependency-fix
+  rm -f bcpc-dependency-fix
+  mv bcpc-dependency-fix_*.deb bcpc-dependency-fix.deb
+fi
 
 # Get some python libs 
 if [ ! -f python-requests-aws_0.1.5_all.deb ]; then
