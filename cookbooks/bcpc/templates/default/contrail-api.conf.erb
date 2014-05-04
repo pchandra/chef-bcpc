@@ -5,10 +5,19 @@
 ################################################
 
 [DEFAULTS]
-log_file = /var/log/opencontrail/opencontrail-schema.log
+log_file = /var/log/contrail/contrail-api.log
+listen_ip_addr = <%="#{node[:bcpc][:management][:ip]}"%>
+ifmap_server_ip = <%="#{node[:bcpc][:management][:ip]}"%>
+ifmap_server_port = 8445
+ifmap_username = api-server
+ifmap_password = api-server
 cassandra_server_list = <%= "#{@servers.collect{|x| x['bcpc']['management']['ip']+':9160'}.join(' ')}" %>
+auth = keystone
+multi_tenancy = True
 disc_server_ip = <%="#{node[:bcpc][:management][:vip]}"%>
 zk_server_ip = <%= "#{@servers.collect{|x| x['bcpc']['management']['ip']+':2181'}.join(',')}" %>
+rabbit_server = <%="#{node[:bcpc][:management][:vip]}"%>
+rabbit_password = <%="#{get_config('rabbitmq-password')}"%>
 
 [KEYSTONE]
 auth_host = <%="#{node[:bcpc][:management][:vip]}"%>

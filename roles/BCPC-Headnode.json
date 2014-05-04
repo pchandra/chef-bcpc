@@ -32,7 +32,7 @@
       "recipe[bcpc::zookeeper]",
       "recipe[bcpc::cassandra]",
       "recipe[bcpc::redis]",
-      "recipe[bcpc::opencontrail-head]",
+      "recipe[bcpc::contrail-head]",
       "role[BCPC-Worknode]"
     ],
     "description": "A highly-available head node in a BCPC cluster",

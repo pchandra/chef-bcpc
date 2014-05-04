@@ -61,6 +61,10 @@ apt-get -y install git \
                    libhttpcore-java \
                    liblog4j1.2-java \
                    libcommons-codec-java \
+                   libcurl4-openssl-dev \
+                   libxml2-utils \
+                   ruby-ronn \
+                   default-jdk \
                    equivs
 if [ -z `gem list --local fpm | grep fpm | cut -f1 -d" "` ]; then
   gem install fpm --no-ri --no-rdoc
@@ -217,7 +221,7 @@ fi
 FILES="zabbix-agent.tar.gz zabbix-server.tar.gz $FILES"
 
 # Build the packages for installing OpenContrail
-if [ ! -f opencontrail-*.deb ]; then
+if [ ! -f contrail-*.deb ]; then
     rm -rf contrail && mkdir -p contrail
     cd contrail
     # Get the git-repo extension to git

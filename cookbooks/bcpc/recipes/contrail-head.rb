@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: bcpc
-# Recipe:: opencontrail-head
+# Recipe:: contrail-head
 #
 # Copyright 2013, Bloomberg Finance L.P.
 #
@@ -28,7 +28,7 @@ include_recipe "bcpc::default"
     end
 end
 
-# Install some of Ubuntu packaged dependencies for opencontrail-config
+# Install some of Ubuntu packaged dependencies for contrail-config
 %w{libzookeeper-mt2 
    python-kombu
    python-zope.interface
@@ -56,7 +56,7 @@ end
    stevedore
    xmltodict
    zc
-   opencontrail}.each do |pkg|
+   contrail}.each do |pkg|
     cookbook_file "/tmp/python-#{pkg}.deb" do
         source "bins/python-#{pkg}.deb"
         owner "root"
@@ -83,7 +83,7 @@ end
 
 %w{ifmap-python-client
    ifmap-server
-   opencontrail-config}.each do |pkg|
+   contrail-config}.each do |pkg|
     cookbook_file "/tmp/#{pkg}.deb" do
         source "bins/#{pkg}.deb"
         owner "root"
@@ -108,37 +108,47 @@ template "/etc/ifmap-server/basicauthusers.properties" do
     notifies :restart, "service[ifmap-server]", :immediately
 end
 
-template "/etc/opencontrail/discovery.conf" do
-    source "opencontrail-discovery.conf.erb"
-    owner "opencontrail"
-    group "opencontrail"
+template "/etc/contrail/discovery.conf" do
+    source "contrail-discovery.conf.erb"
+    owner "contrail"
+    group "contrail"
     mode 00644
     variables( :servers => get_head_nodes )
-    notifies :restart, "service[opencontrail-discovery]", :immediately
+    notifies :restart, "service[contrail-discovery]", :immediately
 end
 
-template "/etc/opencontrail/contrail-api.conf" do
-    source "opencontrail-api.conf.erb"
-    owner "opencontrail"
-    group "opencontrail"
+template "/etc/contrail/contrail-api.conf" do
+    source "contrail-api.conf.erb"
+    owner "contrail"
+    group "contrail"
     mode 00640
     variables( :servers => get_head_nodes )
-    notifies :restart, "service[opencontrail-api]", :immediately
+    notifies :restart, "service[contrail-api]", :immediately
 end
 
-template "/etc/opencontrail/contrail-schema.conf" do
-    source "opencontrail-schema.conf.erb"
-    owner "opencontrail"
-    group "opencontrail"
+template "/etc/contrail/contrail-schema.conf" do
+    source "contrail-schema.conf.erb"
+    owner "contrail"
+    group "contrail"
     mode 00640
     variables( :servers => get_head_nodes )
-    notifies :restart, "service[opencontrail-schema]", :immediately
+    notifies :restart, "service[contrail-schema]", :immediately
+end
+
+template "/etc/contrail/svc-monitor.conf" do
+    source "contrail-svc-monitor.conf.erb"
+    owner "contrail"
+    group "contrail"
+    mode 00640
+    variables( :servers => get_head_nodes )
+    notifies :restart, "service[contrail-svc-monitor]", :immediately
 end
 
 %w{ifmap-server
-   opencontrail-discovery
-   opencontrail-api
-   opencontrail-schema}.each do |pkg|
+   contrail-discovery
+   contrail-api
+   contrail-schema
+   contrail-svc-monitor}.each do |pkg|
     service "#{pkg}" do
         action [ :enable, :start ]
     end
