@@ -275,6 +275,7 @@ for i in https://pypi.python.org/packages/source/b/backports.ssl_match_hostname/
          https://pypi.python.org/packages/source/k/kazoo/kazoo-1.3.1.zip \
          https://pypi.python.org/packages/source/n/ncclient/ncclient-0.4.1.tar.gz \
          https://pypi.python.org/packages/source/p/pycassa/pycassa-1.11.0.tar.gz \
+         https://pypi.python.org/packages/source/r/redis/redis-2.9.1.tar.gz \
          https://pypi.python.org/packages/source/r/requests/requests-2.2.1.tar.gz \
          https://pypi.python.org/packages/source/s/stevedore/stevedore-0.15.tar.gz \
          https://pypi.python.org/packages/source/t/thrift/thrift-0.9.1.tar.gz \

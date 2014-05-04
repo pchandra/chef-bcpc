@@ -10,7 +10,7 @@ listen_ip_addr = <%="#{node[:bcpc][:management][:ip]}"%>
 ifmap_server_ip = <%="#{node[:bcpc][:management][:ip]}"%>
 ifmap_server_port = 8445
 ifmap_username = api-server
-ifmap_password = api-server
+ifmap_password = <%="#{get_config('contrail-api-passwd')}"%>
 cassandra_server_list = <%= "#{@servers.collect{|x| x['bcpc']['management']['ip']+':9160'}.join(' ')}" %>
 auth = keystone
 multi_tenancy = True

@@ -19,6 +19,16 @@
 
 include_recipe "bcpc::default"
 
+ruby_block "initialize-contrail-config" do
+    block do
+        make_config('contrail-api-passwd', secure_password)
+        make_config('contrail-schema-passwd', secure_password)
+        make_config('contrail-svc-monitor-passwd', secure_password)
+        make_config('contrail-control-passwd', secure_password)
+        make_config('contrail-dns-passwd', secure_password)
+    end
+end
+
 # Install some of Ubuntu packaged dependencies for ifmap-server
 %w{libcommons-codec-java
    libhttpcore-java
@@ -28,15 +38,16 @@ include_recipe "bcpc::default"
     end
 end
 
-# Install some of Ubuntu packaged dependencies for contrail-config
-%w{libzookeeper-mt2 
+# Install some of Ubuntu packaged dependencies for contrail
+%w{libzookeeper-mt2
    python-kombu
    python-zope.interface
    python-lxml
    python-gevent
    python-netaddr
    python-netifaces
-   python-psutil}.each do |pkg|
+   python-psutil
+   python-redis}.each do |pkg|
     package "#{pkg}" do
         action :upgrade
     end
@@ -56,6 +67,7 @@ end
    stevedore
    xmltodict
    zc
+   redis
    contrail}.each do |pkg|
     cookbook_file "/tmp/python-#{pkg}.deb" do
         source "bins/python-#{pkg}.deb"
@@ -67,7 +79,7 @@ end
         source "/tmp/python-#{pkg}.deb"
         action :install
     end
-end 
+end
 
 # Install the package to fix-up python-zookeeper dependencies
 cookbook_file "/tmp/bcpc-dependency-fix.deb" do
@@ -83,7 +95,10 @@ end
 
 %w{ifmap-python-client
    ifmap-server
-   contrail-config}.each do |pkg|
+   contrail-lib
+   contrail-config
+   contrail-analytics
+   contrail-control}.each do |pkg|
     cookbook_file "/tmp/#{pkg}.deb" do
         source "bins/#{pkg}.deb"
         owner "root"
@@ -105,6 +120,7 @@ end
 template "/etc/ifmap-server/basicauthusers.properties" do
     source "ifmap-basicauthusers.properties.erb"
     mode 00644
+    variables( :servers => get_head_nodes )
     notifies :restart, "service[ifmap-server]", :immediately
 end
 
@@ -144,11 +160,56 @@ template "/etc/contrail/svc-monitor.conf" do
     notifies :restart, "service[contrail-svc-monitor]", :immediately
 end
 
+template "/etc/contrail/svc-monitor.conf" do
+    source "contrail-svc-monitor.conf.erb"
+    owner "contrail"
+    group "contrail"
+    mode 00640
+    variables( :servers => get_head_nodes )
+    notifies :restart, "service[contrail-svc-monitor]", :immediately
+end
+
+%w{contrail-analytics-api
+   contrail-collector
+   contrail-query-engine}.each do |pkg|
+    template "/etc/contrail/#{pkg}.conf" do
+        source "#{pkg}.conf.erb"
+        owner "contrail"
+        group "contrail"
+        mode 00640
+        variables( :servers => get_head_nodes )
+        notifies :restart, "service[#{pkg}]", :immediately
+    end
+end
+
+template "/etc/contrail/control-node.conf" do
+    source "contrail-control-node.conf.erb"
+    owner "contrail"
+    group "contrail"
+    mode 00640
+    variables( :servers => get_head_nodes )
+    notifies :restart, "service[contrail-control]", :immediately
+end
+
+template "/etc/contrail/dns.conf" do
+    source "contrail-dns.conf.erb"
+    owner "contrail"
+    group "contrail"
+    mode 00640
+    variables( :servers => get_head_nodes )
+    notifies :restart, "service[contrail-dns]", :immediately
+end
+
 %w{ifmap-server
    contrail-discovery
    contrail-api
    contrail-schema
-   contrail-svc-monitor}.each do |pkg|
+   contrail-svc-monitor
+   contrail-analytics-api
+   contrail-collector
+   contrail-query-engine
+   contrail-control
+   contrail-dns}.each do |pkg|
     service "#{pkg}" do
         action [ :enable, :start ]
     end
