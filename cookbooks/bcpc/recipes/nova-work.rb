@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: bcpc
-# Recipe:: nova-head
+# Recipe:: nova-work
 #
 # Copyright 2013, Bloomberg Finance L.P.
 #
@@ -28,7 +28,7 @@ package "nova-compute-#{node['bcpc']['virt_type']}" do
     action :upgrade
 end
 
-%w{nova-api nova-network nova-compute nova-novncproxy}.each do |pkg|
+%w{nova-compute nova-novncproxy}.each do |pkg|
     package pkg do
         action :upgrade
     end
@@ -38,10 +38,6 @@ end
         subscribes :restart, "template[/etc/nova/api-paste.ini]", :delayed
         subscribes :restart, "template[/etc/nova/policy.json]", :delayed
     end
-end
-
-service "nova-api" do
-    restart_command "service nova-api restart; sleep 5"
 end
 
 %w{novnc pm-utils memcached sysfsutils}.each do |pkg|

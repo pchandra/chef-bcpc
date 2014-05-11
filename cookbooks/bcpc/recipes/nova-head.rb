@@ -20,7 +20,7 @@
 include_recipe "bcpc::mysql"
 include_recipe "bcpc::nova-common"
 
-%w{nova-scheduler nova-cert nova-consoleauth nova-conductor}.each do |pkg|
+%w{nova-api nova-scheduler nova-cert nova-consoleauth nova-conductor}.each do |pkg|
     package pkg do
         action :upgrade
     end
@@ -28,7 +28,12 @@ include_recipe "bcpc::nova-common"
         action [:enable, :start]
         subscribes :restart, "template[/etc/nova/nova.conf]", :delayed
         subscribes :restart, "template[/etc/nova/api-paste.ini]", :delayed
+        subscribes :restart, "template[/etc/nova/policy.json]", :delayed
     end
+end
+
+service "nova-api" do
+    restart_command "service nova-api restart; sleep 5"
 end
 
 ruby_block "nova-database-creation" do
@@ -49,6 +54,7 @@ bash "nova-database-sync" do
     action :nothing
     user "root"
     code "nova-manage db sync"
+    notifies :restart, "service[nova-api]", :immediately
     notifies :restart, "service[nova-scheduler]", :immediately
     notifies :restart, "service[nova-cert]", :immediately
     notifies :restart, "service[nova-consoleauth]", :immediately
@@ -70,4 +76,3 @@ ruby_block "reap-dead-servers-from-nova" do
 end
 
 include_recipe "bcpc::nova-work"
-include_recipe "bcpc::nova-setup"
