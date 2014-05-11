@@ -236,6 +236,7 @@ if [ ! -f contrail-*.deb ]; then
     python third_party/fetch_packages.py
     # Now build the debian packages
     make -f packages.make
+    make -f packages.make package-neutron-plugin-contrail
     cd build/packages
     for i in *.deb; do
         BASE=${i/_*/}
@@ -246,23 +247,14 @@ if [ ! -f contrail-*.deb ]; then
     rm -rf contrail
 fi
 
-# Build the neutron packages that have the opencontrail plugin
-if [ ! -f neutron-*.deb ]; then
+# Build the python-neutron package that has the contrail plugin
+if [ ! -f python-neutron*.deb ]; then
     rm -rf neutron
-    git clone -b packages https://github.com/pchandra/neutron
+    git clone -b contrail/havana https://github.com/Juniper/neutron
     cd neutron
-    python setup.py --command-packages=stdeb.command sdist_dsc
-    rm -rf deb_dist/neutron-2013.2/debian
-    cp -R debian deb_dist/neutron-2013.2/
-    cd deb_dist/neutron-2013.2/
-    fakeroot debian/rules binary
+    python setup.py --command-packages=stdeb.command bdist_deb
+    cp deb_dist/python-neutron*.deb ../python-neutron.deb
     cd ..
-    for i in *.deb; do
-        BASE=${i/_*/}
-        mv $i ${BASE}.deb
-    done
-    cp *.deb ../../
-    cd ../../
     rm -rf neutron
 fi
 
