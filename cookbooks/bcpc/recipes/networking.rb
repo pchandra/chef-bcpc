@@ -145,11 +145,9 @@ template "/etc/network/interfaces.d/iface-#{node['bcpc']['floating']['interface'
     mode 00644
     variables(
         :interface => node['bcpc']['floating']['interface'],
-        :ip => node['bcpc']['floating']['ip'],
-        :netmask => node['bcpc']['floating']['netmask'],
-        :gateway => node['bcpc']['floating']['gateway'],
-        :dns => resolvers,
-        :metric => 200
+        :ip => "0.0.0.0",
+        :up => "ifconfig $IFACE up",
+        :down => "ifconfig $IFACE down"
     )
 end
 
