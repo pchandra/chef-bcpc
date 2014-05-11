@@ -21,8 +21,7 @@ include_recipe "bcpc::default"
 
 # Install python dependencies that we package ourselves
 %w{thrift
-   contrail
-   contrail-vrouter-api}.each do |pkg|
+   contrail}.each do |pkg|
     cookbook_file "/tmp/python-#{pkg}.deb" do
         source "bins/python-#{pkg}.deb"
         owner "root"
@@ -39,7 +38,8 @@ end
    contrail-lib
    contrail-vrouter-dkms
    contrail-vrouter-agent
-   contrail-vrouter-utils}.each do |pkg|
+   contrail-vrouter-utils
+   python-contrail-vrouter-api}.each do |pkg|
     cookbook_file "/tmp/#{pkg}.deb" do
         source "bins/#{pkg}.deb"
         owner "root"
