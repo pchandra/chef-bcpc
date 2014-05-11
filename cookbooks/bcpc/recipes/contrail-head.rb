@@ -26,6 +26,7 @@ ruby_block "initialize-contrail-config" do
         make_config('contrail-svc-monitor-passwd', secure_password)
         make_config('contrail-control-passwd', secure_password)
         make_config('contrail-dns-passwd', secure_password)
+        make_config('contrail-metadata-secret', secure_password)
     end
 end
 
@@ -47,6 +48,8 @@ end
    python-netaddr
    python-netifaces
    python-psutil
+   python-paramiko
+   python-crypto
    python-redis}.each do |pkg|
     package "#{pkg}" do
         action :upgrade
@@ -97,6 +100,7 @@ end
    ifmap-server
    contrail-lib
    contrail-config
+   contrail-config-openstack
    contrail-analytics
    contrail-control}.each do |pkg|
     cookbook_file "/tmp/#{pkg}.deb" do
@@ -214,3 +218,5 @@ end
         action [ :enable, :start ]
     end
 end
+
+include_recipe "bcpc::contrail-work"
