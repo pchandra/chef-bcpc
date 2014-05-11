@@ -241,18 +241,18 @@ bash "keystone-service-catalog-swift" do
     only_if ". /root/keystonerc; keystone service-get swift 2>&1 | grep -e '^No service'"
 end
 
-bash "keystone-service-catalog-quantum" do
+bash "keystone-service-catalog-neutron" do
     action :nothing
     user "root"
     code <<-EOH
         . /root/keystonerc
-        export QUANTUM_ID=`keystone service-create --name=quantum --type=network --description="Quantum Service" | grep " id " | awk '{print $4}'`
-        keystone endpoint-create --region #{node['bcpc']['region_name']} --service_id $QUANTUM_ID \
+        export NEUTRON_ID=`keystone service-create --name=neutron --type=network --description="Neutron Service" | grep " id " | awk '{print $4}'`
+        keystone endpoint-create --region #{node['bcpc']['region_name']} --service_id $NEUTRON_ID \
             --publicurl   "http://#{node['bcpc']['management']['vip']}:9696/" \
             --adminurl    "http://#{node['bcpc']['management']['vip']}:9696/" \
             --internalurl "http://#{node['bcpc']['management']['vip']}:9696/"
     EOH
-    only_if ". /root/keystonerc; keystone service-get quantum 2>&1 | grep -e '^No service'"
+    only_if ". /root/keystonerc; keystone service-get neutron 2>&1 | grep -e '^No service'"
 end
 
 bash "keystone-create-users-tenants" do
@@ -273,13 +273,13 @@ bash "keystone-create-users-tenants" do
         # KEYSTONE_GLANCE_USER_ID=`keystone user-create --name $KEYSTONE_GLANCE_USER --tenant_id $KEYSTONE_SERVICE_TENANT_ID --pass $KEYSTONE_GLANCE_PASS --email $KEYSTONE_GLANCE_EMAIL --enabled true | grep " id " | awk '{print $4}'`
         # KEYSTONE_NOVA_USER_ID=`keystone user-create --name $KEYSTONE_NOVA_USER --tenant_id $KEYSTONE_SERVICE_TENANT_ID --pass $KEYSTONE_NOVA_PASS --email $KEYSTONE_NOVA_EMAIL --enabled true | grep " id " | awk '{print $4}'`
         # KEYSTONE_SWIFT_USER_ID=`keystone user-create --name $KEYSTONE_SWIFT_USER --tenant_id $KEYSTONE_SERVICE_TENANT_ID --pass $KEYSTONE_SWIFT_PASS --email $KEYSTONE_SWIFT_EMAIL --enabled true | grep " id " | awk '{print $4}'`
-        # KEYSTONE_QUANTUM_USER_ID=`keystone user-create --name $KEYSTONE_QUANTUM_USER --tenant_id $KEYSTONE_SERVICE_TENANT_ID --pass $KEYSTONE_QUANTUM_PASS --email $KEYSTONE_QUANTUM_EMAIL --enabled true | grep " id " | awk '{print $4}'`
+        # KEYSTONE_NEUTRON_USER_ID=`keystone user-create --name $KEYSTONE_NEUTRON_USER --tenant_id $KEYSTONE_SERVICE_TENANT_ID --pass $KEYSTONE_NEUTRON_PASS --email $KEYSTONE_NEUTRON_EMAIL --enabled true | grep " id " | awk '{print $4}'`
 
         # keystone user-role-add --user_id $KEYSTONE_ADMIN_USER_ID --role_id $KEYSTONE_ROLE_ADMIN_ID --tenant_id $KEYSTONE_SERVICE_TENANT_ID
         # keystone user-role-add --user_id $KEYSTONE_GLANCE_USER_ID --role_id $KEYSTONE_ROLE_ADMIN_ID --tenant_id $KEYSTONE_SERVICE_TENANT_ID
         # keystone user-role-add --user_id $KEYSTONE_NOVA_USER_ID --role_id $KEYSTONE_ROLE_ADMIN_ID --tenant_id $KEYSTONE_SERVICE_TENANT_ID
         # keystone user-role-add --user_id $KEYSTONE_SWIFT_USER_ID --role_id $KEYSTONE_ROLE_ADMIN_ID --tenant_id $KEYSTONE_SERVICE_TENANT_ID
-        # keystone user-role-add --user_id $KEYSTONE_QUANTUM_USER_ID --role_id $KEYSTONE_ROLE_ADMIN_ID --tenant_id $KEYSTONE_SERVICE_TENANT_ID
+        # keystone user-role-add --user_id $KEYSTONE_NEUTRON_USER_ID --role_id $KEYSTONE_ROLE_ADMIN_ID --tenant_id $KEYSTONE_SERVICE_TENANT_ID
     EOH
     only_if ". /root/keystonerc; . /root/adminrc; keystone user-get $OS_USERNAME 2>&1 | grep -e '^No user'"
 end
