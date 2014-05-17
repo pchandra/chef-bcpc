@@ -40,17 +40,17 @@
 # log_category=
 
 # Local log file name
-# log_file=/var/log/contrail/vrouter.log
+log_file=/var/log/contrail/vrouter.log
 
 # Log severity levels. Possible values are SYS_EMERG, SYS_ALERT, SYS_CRIT,
 # SYS_ERR, SYS_WARN, SYS_NOTICE, SYS_INFO and SYS_DEBUG. Default is SYS_DEBUG
-# log_level=SYS_DEBUG
+log_level=SYS_INFO
 
 # Enable/Disable local file logging. Possible values are 0 (disable) and 1 (enable)
 # log_local=0
 
 # Encapsulation type for tunnel. Possible values are MPLSoGRE, MPLSoUDP, VXLAN
-# tunnel_type=
+tunnel_type=MPLSoUDP
 
 [DISCOVERY]
 #If COLLECTOR and/or CONTROL-NODE and/or DNS is not specified this section is
@@ -61,7 +61,7 @@ server=<%="#{node[:bcpc][:management][:vip]}"%>
 
 # Number of control-nodes info to be provided by Discovery service. Possible
 # values are 1 and 2
-# max_control_nodes=1
+max_control_nodes=2
 
 [DNS]
 # IP address to be used to connect to dns-node. Maximum of 2 IP addresses
