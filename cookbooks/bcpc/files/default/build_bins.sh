@@ -220,88 +220,6 @@ if [ ! -f zabbix-agent.tar.gz ] || [ ! -f zabbix-server.tar.gz ]; then
 fi
 FILES="zabbix-agent.tar.gz zabbix-server.tar.gz $FILES"
 
-# Build the packages for installing OpenContrail
-if [ ! -f contrail-*.deb ]; then
-    rm -rf contrail && mkdir -p contrail
-    cd contrail
-    # Get the git-repo extension to git
-    $CURL -L -O http://commondatastorage.googleapis.com/git-repo-downloads/repo
-    chmod +x repo
-    # Permanently add the github host key to avoid failures on checkout
-    ssh -o 'StrictHostKeyChecking no' github.com || true
-    # Get the meta-repo and then pull all the source
-    ./repo init -u git@github.com:Juniper/contrail-vnc < /dev/null
-    ./repo sync
-    # Fetch build dependencies for OpenContrail
-    python third_party/fetch_packages.py
-    # Now build the debian packages
-    make -f packages.make
-    make -f packages.make package-neutron-plugin-contrail
-    cd build/packages
-    for i in *.deb; do
-        BASE=${i/_*/}
-        mv $i ${BASE}.deb
-    done
-    cp *.deb ../../../
-    cd ../../../
-    rm -rf contrail
-fi
-
-# Build the python-neutron package that has the contrail plugin
-if [ ! -f python-neutron*.deb ]; then
-    rm -rf neutron
-    git clone -b contrail/havana https://github.com/Juniper/neutron
-    cd neutron
-    python setup.py --command-packages=stdeb.command bdist_deb
-    cp deb_dist/python-neutron*.deb ../python-neutron.deb
-    cd ..
-    rm -rf neutron
-fi
-
-# Build a bunch of python debs that are OpenContrail dependencies
-for i in https://pypi.python.org/packages/source/b/backports.ssl_match_hostname/backports.ssl_match_hostname-3.4.0.2.tar.gz \
-         https://pypi.python.org/packages/source/b/bitarray/bitarray-0.8.0.tar.gz \
-         https://pypi.python.org/packages/source/b/bottle/bottle-0.12.5.tar.gz \
-         https://pypi.python.org/packages/source/c/certifi/certifi-1.0.1.tar.gz \
-         https://pypi.python.org/packages/source/g/geventhttpclient/geventhttpclient-1.0a.tar.gz \
-         https://pypi.python.org/packages/source/k/kazoo/kazoo-1.3.1.zip \
-         https://pypi.python.org/packages/source/n/ncclient/ncclient-0.4.1.tar.gz \
-         https://pypi.python.org/packages/source/p/pycassa/pycassa-1.11.0.tar.gz \
-         https://pypi.python.org/packages/source/r/redis/redis-2.9.1.tar.gz \
-         https://pypi.python.org/packages/source/r/requests/requests-2.2.1.tar.gz \
-         https://pypi.python.org/packages/source/s/stevedore/stevedore-0.15.tar.gz \
-         https://pypi.python.org/packages/source/t/thrift/thrift-0.9.1.tar.gz \
-         https://pypi.python.org/packages/source/x/xmltodict/xmltodict-0.9.0.tar.gz \
-         https://pypi.python.org/packages/source/z/zc-zookeeper-static/zc-zookeeper-static-3.4.4.zip; do
-    # Setup some variables and assume it's a tarball unless it ends in .zip
-    UNCOMPRESS="tar zxf"
-    if [[ $i == *.zip ]]; then UNCOMPRESS="unzip"; fi
-    FILE=`basename $i`
-    BASE=${FILE/-*/}
-    if [ ! -f python-${BASE}.deb ]; then
-        # Grab the file and uncompress it
-        $CURL -L -O $i
-        $UNCOMPRESS $FILE
-        cd ${BASE}*
-        touch README.md
-        rm -rf debian
-        python setup.py --command-packages=stdeb.command bdist_deb
-        cp deb_dist/python-*.deb ../python-${BASE}.deb
-        cd ..
-        rm -rf ${BASE}*
-    fi
-done
-
-if [ ! -f bcpc-dependency-fix.deb ]; then
-  echo "Package: bcpc-dependency-fix" > bcpc-dependency-fix
-  echo "Depends: python-zc-zookeeper-static" >> bcpc-dependency-fix
-  echo "Provides: python-zookeeper" >> bcpc-dependency-fix
-  echo "Description: Work-around for python-zookeeper dependencies" >> bcpc-dependency-fix
-  equivs-build bcpc-dependency-fix
-  rm -f bcpc-dependency-fix
-  mv bcpc-dependency-fix_*.deb bcpc-dependency-fix.deb
-fi
-
 # Get some python libs 
 if [ ! -f python-requests-aws_0.1.5_all.deb ]; then
     $CURL -L -O http://pypi.python.org/packages/source/r/requests-aws/requests-aws-0.1.5.tar.gz
@@ -310,6 +228,5 @@ if [ ! -f python-requests-aws_0.1.5_all.deb ]; then
     rm -rf requests-aws-0.1.5 requests-aws-0.1.5.tar.gz
 fi
 FILES="python-requests-aws_0.1.5_all.deb $FILES"
-
 
 popd

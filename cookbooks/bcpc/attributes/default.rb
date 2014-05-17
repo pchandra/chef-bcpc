@@ -116,6 +116,8 @@ default['bcpc']['repos']['ceph-fcgi'] = "http://gitbuilder.ceph.com/libapache-mo
 default['bcpc']['repos']['gridcentric'] = "http://downloads.gridcentric.com/packages/%s/%s/ubuntu"
 default['bcpc']['repos']['cassandra'] = "http://www.apache.org/dist/cassandra/debian"
 default['bcpc']['repos']['redis'] = "http://ppa.launchpad.net/chris-lea/redis-server/ubuntu"
+default['bcpc']['repos']['contrail'] = "http://ppa.launchpad.net/opencontrail/ppa/ubuntu"
+
 
 ###########################################
 #

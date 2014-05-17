@@ -17,38 +17,15 @@
 # limitations under the License.
 #
 
-include_recipe "bcpc::default"
-
-# Install python dependencies that we package ourselves
-%w{thrift
-   contrail}.each do |pkg|
-    cookbook_file "/tmp/python-#{pkg}.deb" do
-        source "bins/python-#{pkg}.deb"
-        owner "root"
-        mode 00444
-    end
-    package "python-#{pkg}" do
-        provider Chef::Provider::Package::Dpkg
-        source "/tmp/python-#{pkg}.deb"
-        action :install
-    end
-end
+include_recipe "bcpc::contrail-common"
 
 %w{contrail-nova-driver
-   contrail-lib
    contrail-vrouter-dkms
    contrail-vrouter-agent
    contrail-vrouter-utils
    python-contrail-vrouter-api}.each do |pkg|
-    cookbook_file "/tmp/#{pkg}.deb" do
-        source "bins/#{pkg}.deb"
-        owner "root"
-        mode 00444
-    end
     package "#{pkg}" do
-        provider Chef::Provider::Package::Dpkg
-        source "/tmp/#{pkg}.deb"
-        action :install
+        action :upgrade
     end
 end
 

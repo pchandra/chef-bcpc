@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-include_recipe "bcpc::default"
+include_recipe "bcpc::contrail-common"
 
 ruby_block "initialize-contrail-config" do
     block do
@@ -30,88 +30,12 @@ ruby_block "initialize-contrail-config" do
     end
 end
 
-# Install some of Ubuntu packaged dependencies for ifmap-server
-%w{libcommons-codec-java
-   libhttpcore-java
-   liblog4j1.2-java}.each do |pkg|
-    package "#{pkg}" do
-        action :upgrade
-    end
-end
-
-# Install some of Ubuntu packaged dependencies for contrail
-%w{libzookeeper-mt2
-   python-kombu
-   python-zope.interface
-   python-lxml
-   python-gevent
-   python-netaddr
-   python-netifaces
-   python-psutil
-   python-paramiko
-   python-crypto
-   python-redis}.each do |pkg|
-    package "#{pkg}" do
-        action :upgrade
-    end
-end
-
-# Install python dependencies that we package ourselves
-%w{backports.ssl_match_hostname
-   bitarray
-   bottle
-   certifi
-   geventhttpclient
-   kazoo
-   ncclient
-   thrift
-   pycassa
-   requests
-   stevedore
-   xmltodict
-   zc
-   redis
-   contrail}.each do |pkg|
-    cookbook_file "/tmp/python-#{pkg}.deb" do
-        source "bins/python-#{pkg}.deb"
-        owner "root"
-        mode 00444
-    end
-    package "python-#{pkg}" do
-        provider Chef::Provider::Package::Dpkg
-        source "/tmp/python-#{pkg}.deb"
-        action :install
-    end
-end
-
-# Install the package to fix-up python-zookeeper dependencies
-cookbook_file "/tmp/bcpc-dependency-fix.deb" do
-    source "bins/bcpc-dependency-fix.deb"
-    owner "root"
-    mode 00444
-end
-package "bcpc-dependency-fix" do
-    provider Chef::Provider::Package::Dpkg
-    source "/tmp/bcpc-dependency-fix.deb"
-    action :install
-end
-
-%w{ifmap-python-client
-   ifmap-server
-   contrail-lib
+%w{ifmap-server
    contrail-config
-   contrail-config-openstack
    contrail-analytics
    contrail-control}.each do |pkg|
-    cookbook_file "/tmp/#{pkg}.deb" do
-        source "bins/#{pkg}.deb"
-        owner "root"
-        mode 00444
-    end
     package "#{pkg}" do
-        provider Chef::Provider::Package::Dpkg
-        source "/tmp/#{pkg}.deb"
-        action :install
+        action :upgrade
     end
 end
 
@@ -153,15 +77,6 @@ template "/etc/contrail/contrail-schema.conf" do
     mode 00640
     variables( :servers => get_head_nodes )
     notifies :restart, "service[contrail-schema]", :immediately
-end
-
-template "/etc/contrail/svc-monitor.conf" do
-    source "contrail-svc-monitor.conf.erb"
-    owner "contrail"
-    group "contrail"
-    mode 00640
-    variables( :servers => get_head_nodes )
-    notifies :restart, "service[contrail-svc-monitor]", :immediately
 end
 
 template "/etc/contrail/svc-monitor.conf" do
