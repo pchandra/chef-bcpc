@@ -27,7 +27,7 @@ template "/etc/zookeeper/conf/zoo.cfg" do
     source "zoo.cfg.erb"
     mode 00644
 	variables( :servers => get_head_nodes )
-	notifies :restart, "service[zookeeper]", :delayed
+	notifies :restart, "service[zookeeper]", :immediately
 end
 
 file "/etc/zookeeper/conf/myid" do
