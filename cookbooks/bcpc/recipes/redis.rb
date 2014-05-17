@@ -19,15 +19,16 @@
 
 include_recipe "bcpc::default"
 
-apt_repository "redis" do
-    uri node['bcpc']['repos']['redis']
-    distribution node['lsb']['codename']
-    components ["main"]
-    key "redis.key"
-end
-
-package "redis-server" do
-    action :upgrade
+%w{redis-server python-hiredis python-redis}.each do |pkg|
+    apt_repository "#{pkg}" do
+        uri node['bcpc']['repos'][pkg]
+        distribution node['lsb']['codename']
+        components ["main"]
+        key "redis.key"
+    end
+    package "#{pkg}" do
+        action :upgrade
+    end
 end
 
 template "/etc/redis/redis.conf" do
