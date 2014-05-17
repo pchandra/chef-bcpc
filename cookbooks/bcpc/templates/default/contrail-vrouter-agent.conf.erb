@@ -112,7 +112,7 @@ metadata_proxy_secret=<%="#{get_config('contrail-metadata-secret')}"%>
 name=vhost0
 
 # IP address and prefix in ip/prefix_len format
-ip=<%="#{node[:bcpc][:floating][:cidr]}"%>
+ip=<%="#{node[:bcpc][:floating][:ip]}/#{(node['bcpc']['floating']['cidr'].match /\d+\.\d+\.\d+\.\d+\/(\d+)/)[1]}"%>
 
 # Gateway IP address for virtual host
 gateway=<%="#{node[:bcpc][:floating][:gateway]}"%>
