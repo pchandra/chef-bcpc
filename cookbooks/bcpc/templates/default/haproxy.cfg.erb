@@ -141,6 +141,15 @@ listen cinder-api <%=node['bcpc']['management']['vip']%>:8776
   <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:8776 check inter 1s rise 1 fall 1 observe layer4" %>
 <% end -%>
 
+listen neutron-api <%=node['bcpc']['management']['vip']%>:9696
+  balance  source
+  option  tcplog
+  option httpchk GET /
+  http-check expect status 200
+<% @servers.each do |server| -%>
+  <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:9696 check inter 1s rise 1 fall 1" %>
+<% end -%>
+
 listen opencontrail-api <%=node['bcpc']['management']['vip']%>:8082
   balance  source
   option  tcplog

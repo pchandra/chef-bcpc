@@ -145,6 +145,7 @@ default['bcpc']['mirror']['os-dist'] = ['havana']
 default['bcpc']['nova_dbname'] = "nova"
 default['bcpc']['cinder_dbname'] = "cinder"
 default['bcpc']['glance_dbname'] = "glance"
+default['bcpc']['neutron_dbname'] = "neutron"
 default['bcpc']['horizon_dbname'] = "horizon"
 default['bcpc']['keystone_dbname'] = "keystone"
 default['bcpc']['heat_dbname'] = "heat"

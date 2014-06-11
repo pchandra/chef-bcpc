@@ -14,6 +14,7 @@
       "recipe[bcpc::ceph-work]",
       "recipe[bcpc::ceph-rgw]",
       "recipe[bcpc::contrail-work]",
+      "recipe[bcpc::neutron-work]",
       "recipe[bcpc::nova-work]",
       "recipe[bcpc::diamond]",
       "recipe[bcpc::fluentd]",

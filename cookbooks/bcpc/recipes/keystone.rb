@@ -242,7 +242,6 @@ bash "keystone-service-catalog-swift" do
 end
 
 bash "keystone-service-catalog-neutron" do
-    action :nothing
     user "root"
     code <<-EOH
         . /root/keystonerc
