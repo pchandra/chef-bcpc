@@ -63,30 +63,31 @@ deb-i386 http://ubuntu-cloud.archive.canonical.com/ubuntu precise-<%= @repo %>/<
 deb http://packages.treasure-data.com/precise precise contrib
 deb-i386 http://packages.treasure-data.com/precise precise contrib
 
+deb http://ppa.launchpad.net/chris-lea/redis-server/ubuntu <%= @distro %> main
+deb-i386 http://ppa.launchpad.net/chris-lea/redis-server/ubuntu <%= @distro %> main
+
+deb http://ppa.launchpad.net/chris-lea/python-hiredis/ubuntu <%= @distro %> main
+deb-i386 http://ppa.launchpad.net/chris-lea/python-hiredis/ubuntu <%= @distro %> main
+
+deb http://ppa.launchpad.net/chris-lea/python-redis/ubuntu <%= @distro %> main
+deb-i386 http://ppa.launchpad.net/chris-lea/python-redis/ubuntu <%= @distro %> main
+
+deb http://ppa.launchpad.net/opencontrail/ppa/ubuntu <%= @distro %> main
+deb-i386 http://ppa.launchpad.net/opencontrail/ppa/ubuntu <%= @distro %> main
+
 <% end %>
 
 # no distro specific packages yet (20140616)
 deb http://www.rabbitmq.com/debian testing main
 deb-i386 http://www.rabbitmq.com/debian testing main
 
-# no trusty packages yet (20140529)
-deb http://public-repo-1.hortonworks.com/HDP-UTILS-1.1.0.16/repos/ubuntu12 HDP-UTILS main
-deb http://public-repo-1.hortonworks.com/HDP/ubuntu12/2.x HDP main
-
+# no distro specific packages (20140616)
 deb http://www.apache.org/dist/cassandra/debian 11x main
 deb-i386 http://www.apache.org/dist/cassandra/debian 11x main
 
-deb http://ppa.launchpad.net/chris-lea/redis-server/ubuntu precise main
-deb-i386 http://ppa.launchpad.net/chris-lea/redis-server/ubuntu precise main
-
-deb http://ppa.launchpad.net/chris-lea/python-hiredis/ubuntu precise main
-deb-i386 http://ppa.launchpad.net/chris-lea/python-hiredis/ubuntu precise main
-
-deb http://ppa.launchpad.net/chris-lea/python-redis/ubuntu precise main
-deb-i386 http://ppa.launchpad.net/chris-lea/python-redis/ubuntu precise main
-
-deb http://ppa.launchpad.net/opencontrail/ppa/ubuntu precise main
-deb-i386 http://ppa.launchpad.net/opencontrail/ppa/ubuntu precise main
+# no trusty packages yet (20140529)
+deb http://public-repo-1.hortonworks.com/HDP-UTILS-1.1.0.16/repos/ubuntu12 HDP-UTILS main
+deb http://public-repo-1.hortonworks.com/HDP/ubuntu12/2.x HDP main
 
 clean http://<%=@node['bcpc']['mirror']['ubuntu']%>
 clean http://ceph.com
@@ -97,4 +98,6 @@ clean http://ubuntu-cloud.archive.canonical.com/ubuntu
 clean http://apt.opscode.com
 clean http://www.rabbitmq.com/debian
 clean http://packages.treasure-data.com
+clean http://ppa.launchpad.net
+clean http://www.apache.org
 clean http://public-repo-1.hortonworks.com
