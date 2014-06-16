@@ -32,8 +32,10 @@ end
 
 %w{ifmap-server
    contrail-config
+   contrail-config-openstack
    contrail-analytics
-   contrail-control}.each do |pkg|
+   contrail-control
+   contrail-utils}.each do |pkg|
     package "#{pkg}" do
         action :upgrade
     end

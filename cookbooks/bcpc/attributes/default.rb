@@ -119,6 +119,7 @@ default['bcpc']['repos']['redis-server'] = "http://ppa.launchpad.net/chris-lea/r
 default['bcpc']['repos']['python-hiredis'] = "http://ppa.launchpad.net/chris-lea/python-hiredis/ubuntu"
 default['bcpc']['repos']['python-redis'] = "http://ppa.launchpad.net/chris-lea/python-redis/ubuntu"
 default['bcpc']['repos']['contrail'] = "http://ppa.launchpad.net/opencontrail/ppa/ubuntu"
+default['bcpc']['repos']['contrail-snapshots'] = "http://ppa.launchpad.net/opencontrail/snapshots/ubuntu"
 
 ###########################################
 #
