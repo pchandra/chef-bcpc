@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Utility function to check for errors and exit if so
+function check_exit {
+	if (($?)); then
+		echo "**** Pre-commit hook failed"
+		exit 1
+	fi
+}
+
+TOP=`git rev-parse --show-toplevel`
+COOKBOOKS=$TOP/cookbooks
+
+echo "---- Checking whitespace"
+git diff-index --check --cached HEAD --
+check_exit
+
+echo "---- Checking knife cookbook tests"
+knife cookbook test bcpc -o "$COOKBOOKS"
+check_exit
+
+echo "---- Checking for 'tailor' in PATH"
+TAILOR=`which tailor`
+check_exit
+
+echo "---- Checking for clean tailor scan"
+git diff-index --name-only --diff-filter=ACM HEAD -- '*.rb' | while read file; do
+	$TAILOR --max-line-length off "$file"
+	check_exit
+done
+
+echo "---- Checking for 'foodcritic' in PATH"
+FOODCRITIC=`which foodcritic`
+check_exit
+
+echo "---- Checking for clean foodcritic scan"
+$FOODCRITIC -f any -t ~FC014 -t ~FC048 "$COOKBOOKS/bcpc"
+check_exit
