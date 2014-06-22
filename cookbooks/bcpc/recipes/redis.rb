@@ -20,13 +20,13 @@
 include_recipe "bcpc::default"
 
 %w{redis-server python-hiredis python-redis}.each do |pkg|
-    apt_repository "#{pkg}" do
+    apt_repository pkg do
         uri node['bcpc']['repos'][pkg]
         distribution node['lsb']['codename']
         components ["main"]
         key "redis.key"
     end
-    package "#{pkg}" do
+    package pkg do
         action :upgrade
     end
 end
@@ -36,8 +36,10 @@ template "/etc/redis/redis.conf" do
     mode 00640
     owner "redis"
     group "redis"
-    variables( :port => 6379,
-               :count => "" )
+    variables(
+        :port => 6379,
+        :count => ""
+    )
     notifies :restart, "service[redis-server]", :immediately
 end
 
@@ -50,8 +52,10 @@ template "/etc/redis/redis-sentinel.conf.chef" do
     mode 00640
     owner "redis"
     group "redis"
-    variables( :servers => get_head_nodes,
-               :min_quorum => get_head_nodes.length/2 + 1 )
+    variables(
+        :servers => get_head_nodes,
+        :min_quorum => get_head_nodes.length/2 + 1
+    )
     notifies :restart, "service[redis-sentinel]", :delayed
     notifies :run, "bash[install-chef-sentinel-conf]", :immediately
 end
@@ -72,11 +76,11 @@ template "/etc/init.d/redis-sentinel" do
 end
 
 service "redis-server" do
-    action [ :enable, :start ]
+    action [:enable, :start]
 end
 
 service "redis-sentinel" do
-    action [ :enable, :start ]
+    action [:enable, :start]
 end
 
 # For HA, we'll run additional redis-servers in slave mode so that the
@@ -87,7 +91,7 @@ end
 # and N/2 slaves. To do this, we get each headnode's redis slaves to slave
 # to N/2 machines to the 'right' of themselves (wrapping around the Array
 # if needed).
-ips = get_head_nodes.collect{|x| x['bcpc']['management']['ip']}.sort
+ips = get_head_nodes.collect { |x| x['bcpc']['management']['ip'] }.sort
 offset = ips.index(node['bcpc']['management']['ip']) || 0
 (ips.length/2).times do |count|
     template "/etc/redis/redis#{count+2}.conf" do
@@ -95,18 +99,20 @@ offset = ips.index(node['bcpc']['management']['ip']) || 0
         mode 00640
         owner "redis"
         group "redis"
-        variables( :port => 6379+count+1,
-                   :count => "#{count+2}",
-                   :slave => ips[(offset+count+1)%ips.length] )
+        variables(
+            :port => 6379+count+1,
+            :count => count+2,
+            :slave => ips[(offset+count+1)%ips.length]
+        )
         notifies :restart, "service[redis-server#{count+2}]", :delayed
     end
     template "/etc/init.d/redis-server#{count+2}" do
         source "init.d-redis-server.erb"
         mode 00755
-        variables( :count => "#{count+2}" )
+        variables(:count => count+2)
         notifies :restart, "service[redis-server#{count+2}]", :immediately
     end
     service "redis-server#{count+2}" do
-        action [ :enable, :start ]
+        action [:enable, :start]
     end
 end

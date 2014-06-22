@@ -26,8 +26,8 @@ end
 template "/etc/zookeeper/conf/zoo.cfg" do
     source "zoo.cfg.erb"
     mode 00644
-	variables( :servers => get_head_nodes )
-	notifies :restart, "service[zookeeper]", :immediately
+    variables(:servers => get_head_nodes)
+    notifies :restart, "service[zookeeper]", :immediately
 end
 
 file "/etc/zookeeper/conf/myid" do
@@ -39,5 +39,5 @@ file "/etc/zookeeper/conf/myid" do
 end
 
 service "zookeeper" do
-    action [ :enable, :start ]
+    action [:enable, :start]
 end

@@ -33,7 +33,7 @@ end
 
 ruby_block "calculate-node-token-value" do
     block do
-        ips = get_head_nodes.collect{|x| x['bcpc']['management']['ip']}.sort
+        ips = get_head_nodes.collect { |x| x['bcpc']['management']['ip'] }.sort
         tokens = %x[token-generator #{ips.length} | tail -#{ips.length} | awk '{print $3}'].split
         node.set['bcpc']['mytoken'] = tokens[ips.index(node['bcpc']['management']['ip']) || 0]
         node.save rescue nil
@@ -44,8 +44,8 @@ end
     template "/etc/cassandra/#{file}" do
         source "#{file}.erb"
         mode 00644
-      variables( :servers => get_head_nodes )
-      notifies :restart, "service[cassandra]", :delayed
+        variables(:servers => get_head_nodes)
+        notifies :restart, "service[cassandra]", :delayed
     end
 end
 
@@ -62,7 +62,7 @@ bash "fix-mismatched-cassandra-cluster-name" do
 end
 
 service "cassandra" do
-    action [ :enable, :start ]
+    action [:enable, :start]
     restart_command "service cassandra stop && service cassandra start && sleep 5"
 end
 

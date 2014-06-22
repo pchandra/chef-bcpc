@@ -24,7 +24,7 @@ include_recipe "bcpc::contrail-common"
    contrail-vrouter-agent
    contrail-vrouter-utils
    python-contrail-vrouter-api}.each do |pkg|
-    package "#{pkg}" do
+    package pkg do
         action :upgrade
     end
 end
@@ -62,12 +62,12 @@ template "/etc/contrail/contrail-vrouter-agent.conf" do
     owner "contrail"
     group "contrail"
     mode 00644
-    variables( :servers => get_head_nodes )
+    variables(:servers => get_head_nodes)
     notifies :restart, "service[contrail-vrouter-agent]", :immediately
 end
 
 %w{contrail-vrouter-agent}.each do |pkg|
-    service "#{pkg}" do
-        action [ :enable, :start ]
+    service pkg do
+        action [:enable, :start]
     end
 end

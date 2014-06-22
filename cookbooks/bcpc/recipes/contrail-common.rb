@@ -38,5 +38,5 @@ template "/usr/local/bin/hup_contrail" do
     mode 0755
     owner "root"
     group "root"
-    variables( :servers => get_head_nodes )
+    variables(:servers => get_head_nodes)
 end

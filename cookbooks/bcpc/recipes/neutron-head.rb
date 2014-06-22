@@ -34,7 +34,7 @@ end
 end
 
 service "neutron-server" do
-    action [ :enable, :start ]
+    action [:enable, :start]
 end
 
 bash "config-contrail-ini" do
