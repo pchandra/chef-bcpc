@@ -108,7 +108,6 @@ template "/etc/contrail/control-node.conf" do
     owner "contrail"
     group "contrail"
     mode 00640
-    variables(:servers => get_head_nodes)
     notifies :restart, "service[contrail-control]", :immediately
 end
 
@@ -117,7 +116,6 @@ template "/etc/contrail/dns.conf" do
     owner "contrail"
     group "contrail"
     mode 00640
-    variables(:servers => get_head_nodes)
     notifies :restart, "service[contrail-dns]", :immediately
 end
 

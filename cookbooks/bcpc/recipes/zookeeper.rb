@@ -34,7 +34,7 @@ file "/etc/zookeeper/conf/myid" do
     user "root"
     group "root"
     mode 00644
-    content "#{node['bcpc']['node_number']}"
+    content node['bcpc']['node_number']
     notifies :restart, "service[zookeeper]", :immediately
 end
 

@@ -4,7 +4,7 @@
 #
 ################################################
 
-bind <%="#{node['bcpc']['management']['ip']}"%>
+bind <%=node['bcpc']['management']['ip']%>
 loglevel notice
 logfile /var/log/redis/redis-sentinel.log
 daemonize yes

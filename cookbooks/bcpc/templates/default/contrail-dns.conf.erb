@@ -8,7 +8,7 @@
 log_file = /var/log/contrail/contrail-dns.log
 # collectors= # Provided by discovery server
 # dns_config_file=dns_config.xml
-hostip = <%="#{node[:bcpc][:management][:ip]}"%>
+hostip = <%=node['bcpc']['management']['ip']%>
 # hostname= # Retrieved as `hostname`
 # http_server_port=8092
 # log_category=
@@ -21,11 +21,11 @@ hostip = <%="#{node[:bcpc][:management][:ip]}"%>
 # test_mode=0
 
 [DISCOVERY]
-server =  <%="#{node[:bcpc][:management][:vip]}"%>
+server =  <%=node['bcpc']['management']['vip']%>
 #port = 5998
 
 [IFMAP]
 # certs_store=
-server_url = http://<%="#{node[:bcpc][:management][:ip]}"%>:8445
-user = dns-<%="#{node['bcpc']['node_number']}"%>
-password = <%="#{get_config('contrail-dns-passwd')}"%>
+server_url = http://<%=node['bcpc']['management']['ip']%>:8445
+user = dns-<%=node['bcpc']['node_number']%>
+password = <%=get_config('contrail-dns-passwd')%>

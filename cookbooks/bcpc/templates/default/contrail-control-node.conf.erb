@@ -9,7 +9,7 @@ log_file = /var/log/contrail/contrail-control.log
 # bgp_config_file=bgp_config.xml
 # bgp_port=179
 # collectors= # Provided by discovery server
-hostip = <%="#{node[:bcpc][:management][:ip]}"%>
+hostip = <%=node['bcpc']['management']['ip']%>
 # hostname= # Retrieved as `hostname`
 # http_server_port=8083
 # log_category=
@@ -23,11 +23,11 @@ hostip = <%="#{node[:bcpc][:management][:ip]}"%>
 # xmpp_server_port=5269
 
 [DISCOVERY]
-server =  <%="#{node[:bcpc][:management][:vip]}"%>
+server =  <%=node['bcpc']['management']['vip']%>
 #port = 5998
 
 [IFMAP]
 # certs_store=
-server_url = http://<%="#{node[:bcpc][:management][:ip]}"%>:8445
-user = control-<%="#{node['bcpc']['node_number']}"%>
-password = <%="#{get_config('contrail-control-passwd')}"%>
+server_url = http://<%=node['bcpc']['management']['ip']%>:8445
+user = control-<%=node['bcpc']['node_number']%>
+password = <%=get_config('contrail-control-passwd')%>

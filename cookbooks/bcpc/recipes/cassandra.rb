@@ -57,7 +57,7 @@ bash "fix-mismatched-cassandra-cluster-name" do
         mkdir /var/lib/cassandra
         chown cassandra:cassandra /var/lib/cassandra
     EOH
-    not_if "grep '#{node[:bcpc][:region_name]}' /var/lib/cassandra/data/system/LocationInfo/*"
+    not_if "grep '#{node['bcpc']['region_name']}' /var/lib/cassandra/data/system/LocationInfo/*"
     notifies :restart, "service[cassandra]", :immediately
 end
 

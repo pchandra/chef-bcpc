@@ -22,8 +22,8 @@
 
 # These properties are used with GossipingPropertyFileSnitch and will
 # indicate the rack and dc for this node
-dc=<%="#{node[:bcpc][:region_name]}"%>
-rack=<%="#{node[:bcpc][:rack_name]}"%>
+dc=<%=node['bcpc']['region_name']%>
+rack=<%=node['bcpc']['rack_name']%>
 
 # Add a suffix to a datacenter name. Used by the Ec2Snitch and Ec2MultiRegionSnitch
 # to append a string to the EC2 region name.

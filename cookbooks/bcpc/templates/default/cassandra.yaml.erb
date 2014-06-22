@@ -13,7 +13,7 @@
 
 # The name of the cluster. This is mainly used to prevent machines in
 # one logical cluster from joining another.
-cluster_name: '<%="#{node[:bcpc][:region_name]}"%>'
+cluster_name: '<%=node['bcpc']['region_name']%>'
 
 # You should always specify InitialToken when setting up a production
 # cluster for the first time, and often when adding capacity later.
@@ -25,7 +25,7 @@ cluster_name: '<%="#{node[:bcpc][:region_name]}"%>'
 # the heaviest-loaded existing node.  If there is no load information
 # available, such as is the case with a new cluster, it will pick
 # a random token, which will lead to hot spots.
-initial_token: '<%="#{node[:bcpc][:mytoken]}"%>'
+initial_token: '<%=node['bcpc']['mytoken']%>'
 
 # See http://wiki.apache.org/cassandra/HintedHandoff
 hinted_handoff_enabled: true
@@ -184,7 +184,7 @@ seed_provider:
       parameters:
           # seeds is actually a comma-delimited list of addresses.
           # Ex: "<ip1>,<ip2>,<ip3>"
-          - seeds: "<%="#{@servers.collect{|x| x['bcpc']['management']['ip']}.join(',')}"%>"
+          - seeds: "<%= @servers.collect{|x| x['bcpc']['management']['ip']}.join(',') %>"
 
 # emergency pressure valve: each time heap usage after a full (CMS)
 # garbage collection is above this fraction of the max, Cassandra will
@@ -275,7 +275,7 @@ ssl_storage_port: 7001
 # address associated with the hostname (it might not be).
 #
 # Setting this to 0.0.0.0 is always wrong.
-listen_address: <%="#{node[:bcpc][:management][:ip]}"%>
+listen_address: <%=node['bcpc']['management']['ip']%>
 
 # Address to broadcast to other Cassandra nodes
 # Leaving this blank will set it to the same value as listen_address
@@ -291,7 +291,7 @@ listen_address: <%="#{node[:bcpc][:management][:ip]}"%>
 # 
 # Leaving this blank has the same effect it does for ListenAddress,
 # (i.e. it will be based on the configured hostname of the node).
-rpc_address: <%="#{node[:bcpc][:management][:ip]}"%>
+rpc_address: <%=node['bcpc']['management']['ip']%>
 # port for Thrift to listen for clients on
 rpc_port: 9160
 

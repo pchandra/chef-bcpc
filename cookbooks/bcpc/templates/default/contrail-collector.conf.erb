@@ -7,9 +7,9 @@
 [DEFAULT]
 log_file = /var/log/contrail/contrail-collector.log
 # analytics_data_ttl=48
-cassandra_server_list = <%= "#{@servers.collect{|x| x['bcpc']['management']['ip']+':9160'}.join(' ')}" %>
+cassandra_server_list = <%= @servers.collect{|x| x['bcpc']['management']['ip']+':9160'}.join(' ') %>
 # dup=0
-hostip = <%="#{node[:bcpc][:management][:ip]}"%>
+hostip = <%=node['bcpc']['management']['ip']%>
 # hostname= # Retrieved as `hostname`
 # http_server_port=8089
 # log_category=
@@ -27,9 +27,9 @@ hostip = <%="#{node[:bcpc][:management][:ip]}"%>
 # server=0.0.0.0
 
 [DISCOVERY]
-server =  <%="#{node[:bcpc][:management][:vip]}"%>
+server =  <%=node['bcpc']['management']['vip']%>
 #port = 5998
 
 [REDIS]
-server = <%="#{node[:bcpc][:management][:ip]}"%>
+server = <%=node['bcpc']['management']['ip']%>
 port = 6379
