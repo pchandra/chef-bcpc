@@ -63,6 +63,14 @@ template "/etc/neutron/api-paste.ini" do
     notifies :restart, "service[neutron-server]", :delayed
 end
 
+template "/etc/contrail/vnc_api_lib.ini" do
+    source "contrail-vnc_api_lib.ini.erb"
+    owner "neutron"
+    group "neutron"
+    mode 00644
+    notifies :restart, "service[neutron-server]", :delayed
+end
+
 template "/etc/neutron/plugins/opencontrail/ContrailPlugin.ini" do
     source "contrailplugin.ini.erb"
     owner "root"
