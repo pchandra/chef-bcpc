@@ -4,6 +4,11 @@
 #
 ################################################
 
+[composite:quantum]
+use = egg:Paste#urlmap
+/: neutronversions
+/v2.0: neutronapi_v2_0
+
 [composite:neutron]
 use = egg:Paste#urlmap
 /: neutronversions
