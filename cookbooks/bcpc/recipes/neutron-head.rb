@@ -55,6 +55,14 @@ template "/etc/neutron/neutron.conf" do
     notifies :restart, "service[neutron-server]", :delayed
 end
 
+template "/etc/neutron/api-paste.ini" do
+    source "neutron.api-paste.ini.erb"
+    owner "neutron"
+    group "neutron"
+    mode 00600
+    notifies :restart, "service[neutron-server]", :delayed
+end
+
 template "/etc/neutron/plugins/opencontrail/ContrailPlugin.ini" do
     source "contrailplugin.ini.erb"
     owner "root"
