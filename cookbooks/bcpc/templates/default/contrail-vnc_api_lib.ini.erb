@@ -4,6 +4,9 @@
 #
 ################################################
 
+[global]
+WEB_SERVER = <%=node['bcpc']['management']['vip']%>
+
 [auth]
 AUTHN_TYPE = keystone
 AUTHN_SERVER = <%=node['bcpc']['management']['vip']%>
