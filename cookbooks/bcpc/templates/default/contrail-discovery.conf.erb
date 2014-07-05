@@ -7,6 +7,7 @@
 [DEFAULTS]
 zk_server_ip=<%= @servers.collect{|x| x['bcpc']['management']['ip']}.join(',') %>
 zk_server_port=2181
+cassandra_server_list = <%= @servers.collect{|x| x['bcpc']['management']['ip']+':9160'}.join(' ') %>
 listen_ip_addr=<%=node['bcpc']['management']['ip']%>
 listen_port=5998
 log_local=True
