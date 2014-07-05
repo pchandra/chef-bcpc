@@ -10,3 +10,4 @@ iface vhost0 inet static
  pre-up vif --add vhost0 --mac $(cat /sys/class/net/<%= @interface %>/address) --vrf 0 --mode x --type vhost
  address <%= @ip %>
  netmask <%= @netmask %>
+ gateway <%= @gateway %>

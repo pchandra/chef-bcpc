@@ -47,7 +47,8 @@ template "/etc/network/interfaces.d/iface-vhost0" do
     variables(
         :interface => node['bcpc']['floating']['interface'],
         :ip => node['bcpc']['floating']['ip'],
-        :netmask => node['bcpc']['floating']['netmask']
+        :netmask => node['bcpc']['floating']['netmask'],
+        :gateway => node['bcpc']['floating']['gateway']
     )
 end
 
