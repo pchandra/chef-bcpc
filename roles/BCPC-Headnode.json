@@ -26,7 +26,7 @@
       "recipe[bcpc::keystone]",
       "recipe[bcpc::glance]",
       "recipe[bcpc::cinder]",
-      "recipe[bcpc::neutron-head]",
+      "recipe[bcpc::neutron]",
       "recipe[bcpc::nova-head]",
       "recipe[bcpc::heat]",
       "recipe[bcpc::horizon]",
