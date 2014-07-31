@@ -63,6 +63,13 @@ template "/etc/neutron/api-paste.ini" do
     notifies :restart, "service[neutron-server]", :delayed
 end
 
+# Ensure neutron user can read contrail directory
+directory "/etc/contrail" do
+    owner "contrail"
+    group "contrail"
+    mode 00755
+end
+
 template "/etc/contrail/vnc_api_lib.ini" do
     source "contrail-vnc_api_lib.ini.erb"
     owner "neutron"
