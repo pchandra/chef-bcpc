@@ -26,13 +26,6 @@ apt_repository "contrail" do
     key "contrail.key"
 end
 
-apt_repository "contrail-snapshots" do
-    uri node['bcpc']['repos']['contrail-snapshots']
-    distribution node['lsb']['codename']
-    components ["main"]
-    key "contrail.key"
-end
-
 template "/usr/local/bin/hup_contrail" do
     source "hup_contrail.erb"
     mode 0755
