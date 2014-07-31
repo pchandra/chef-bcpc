@@ -20,7 +20,7 @@
 include_recipe "bcpc::mysql"
 include_recipe "bcpc::openstack"
 
-ruby_block "initialize-glance-config" do
+ruby_block "initialize-neutron-config" do
     block do
         make_config('mysql-neutron-user', "neutron")
         make_config('mysql-neutron-password', secure_password)
