@@ -315,13 +315,17 @@ root_helper = sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf
 # ===========  end of items for agent management extension =====
 
 [keystone_authtoken]
+cafile = /etc/ssl/certs/ssl-bcpc.pem
+auth_uri = https://<%=node['bcpc']['management']['vip']%>:5000/v2.0/
 auth_host = <%=node['bcpc']['management']['vip']%>
 auth_port = 35357
 auth_protocol = https
+auth_version = v2.0
 admin_tenant_name = <%=node['bcpc']['admin_tenant']%>
 admin_user = <%=get_config('keystone-admin-user')%>
 admin_password = <%=get_config('keystone-admin-password')%>
-signing_dir = $state_path/keystone-signing
+admin_token = <%=get_config('keystone-admin-token')%>
+signing_dir = /var/lib/neutron
 
 [database]
 # This line MUST be changed to actually run the plugin.
