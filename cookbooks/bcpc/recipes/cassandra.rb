@@ -21,7 +21,7 @@ include_recipe "bcpc::default"
 
 apt_repository "cassandra" do
     uri node['bcpc']['repos']['cassandra']
-    distribution "11x"
+    distribution "12x"
     components ["main"]
     key "cassandra.key"
 end
@@ -29,15 +29,18 @@ end
 package "cassandra" do
     action :upgrade
     notifies :stop, "service[cassandra]", :immediately
+    notifies :run, "bash[remove-initial-cassandra-data-dir]", :immediately
 end
 
-ruby_block "calculate-node-token-value" do
-    block do
-        ips = get_head_nodes.collect { |x| x['bcpc']['management']['ip'] }.sort
-        tokens = %x[token-generator #{ips.length} | tail -#{ips.length} | awk '{print $3}'].split
-        node.set['bcpc']['mytoken'] = tokens[ips.index(node['bcpc']['management']['ip']) || 0]
-        node.save rescue nil
-    end
+bash "remove-initial-cassandra-data-dir" do
+    action :nothing
+    user "root"
+    code <<-EOH
+        TIMESTAMP=`date +%Y%m%d-%H%M%S`
+        mv /var/lib/cassandra /var/lib/cassandra.$TIMESTAMP
+        mkdir /var/lib/cassandra
+        chown cassandra:cassandra /var/lib/cassandra
+    EOH
 end
 
 %w{cassandra-env.sh cassandra-rackdc.properties cassandra.yaml}.each do |file|
@@ -49,29 +52,7 @@ end
     end
 end
 
-bash "fix-mismatched-cassandra-cluster-name" do
-    user "root"
-    code <<-EOH
-        TIMESTAMP=`date +%Y%m%d-%H%M%S`
-        mv /var/lib/cassandra /var/lib/cassandra.$TIMESTAMP
-        mkdir /var/lib/cassandra
-        chown cassandra:cassandra /var/lib/cassandra
-    EOH
-    not_if "grep '#{node['bcpc']['region_name']}' /var/lib/cassandra/data/system/LocationInfo/*"
-    notifies :restart, "service[cassandra]", :immediately
-end
-
 service "cassandra" do
     action [:enable, :start]
     restart_command "service cassandra stop && service cassandra start && sleep 5"
-end
-
-ruby_block "set-active-token-value" do
-    block do
-        if not system "nodetool --host #{node['bcpc']['management']['ip']} info | grep Token | grep ' #{node['bcpc']['mytoken']}$'" then
-            %x[ nodetool --host #{node['bcpc']['management']['ip']} move #{node['bcpc']['mytoken']}
-                nodetool --host #{node['bcpc']['management']['ip']} cleanup
-            ]
-        end
-    end
 end
