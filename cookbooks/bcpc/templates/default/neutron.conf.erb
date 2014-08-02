@@ -144,7 +144,8 @@ rabbit_password = <%=get_config('rabbitmq-password')%>
 # rabbit_retry_interval = 1
 # Use HA queues in RabbitMQ (x-ha-policy: all).You need to
 # wipe RabbitMQ database when changing this option. (boolean value)
-# rabbit_ha_queues = false
+rabbit_ha_queues = False
+rabbit_durable_queues = True
 
 # QPID
 # rpc_backend=neutron.openstack.common.rpc.impl_qpid
