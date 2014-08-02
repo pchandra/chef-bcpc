@@ -36,6 +36,7 @@ end
     contrail-analytics
     contrail-control
     contrail-utils
+    contrail-webui-bundle
 }.each do |pkg|
     package pkg do
         action :upgrade
@@ -100,6 +101,16 @@ end
     end
 end
 
+template "/etc/contrail-webui-bundle/config.global.js" do
+    source "contrail-config.global.js.erb"
+    owner "contrail"
+    group "contrail"
+    mode 00640
+    variables(:servers => get_head_nodes)
+    notifies :restart, "service[contrail-webui-jobserver]", :immediately
+    notifies :restart, "service[contrail-webui-webserver]", :immediately
+end
+
 %w{ ifmap-server
     contrail-discovery
     contrail-api
@@ -110,8 +121,10 @@ end
     contrail-query-engine
     contrail-control
     contrail-dns
-}.each do |pkg|
-    service pkg do
+    contrail-webui-jobserver
+    contrail-webui-webserver
+}.each do |svc|
+    service svc do
         action [:enable, :start]
     end
 end
