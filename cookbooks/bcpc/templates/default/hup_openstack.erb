@@ -16,6 +16,7 @@ for i in keystone \
          cinder-scheduler \
          cinder-volume \
          neutron-server \
+         nova-api \
          nova-cert \
          nova-conductor \
          nova-consoleauth \
@@ -34,8 +35,7 @@ done
 echo
 echo "################################"
 echo "# WORK NODE SERVICES"
-for i in nova-api \
-         nova-compute \
+for i in nova-compute \
          nova-novncproxy \
          ceilometer-agent-compute
 do
