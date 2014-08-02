@@ -30,12 +30,13 @@ ruby_block "initialize-contrail-config" do
     end
 end
 
-%w{ifmap-server
-   contrail-config
-   contrail-config-openstack
-   contrail-analytics
-   contrail-control
-   contrail-utils}.each do |pkg|
+%w{ ifmap-server
+    contrail-config
+    contrail-config-openstack
+    contrail-analytics
+    contrail-control
+    contrail-utils
+}.each do |pkg|
     package pkg do
         action :upgrade
     end
@@ -61,52 +62,17 @@ template "/etc/ifmap-server/basicauthusers.properties" do
     notifies :restart, "service[ifmap-server]", :immediately
 end
 
-template "/etc/contrail/discovery.conf" do
-    source "contrail-discovery.conf.erb"
-    owner "contrail"
-    group "contrail"
-    mode 00644
-    variables(:servers => get_head_nodes)
-    notifies :restart, "service[contrail-discovery]", :immediately
-end
-
-template "/etc/contrail/contrail-api.conf" do
-    source "contrail-api.conf.erb"
-    owner "contrail"
-    group "contrail"
-    mode 00640
-    variables(:servers => get_head_nodes)
-    notifies :restart, "service[contrail-api]", :immediately
-end
-
-template "/etc/contrail/contrail-schema.conf" do
-    source "contrail-schema.conf.erb"
-    owner "contrail"
-    group "contrail"
-    mode 00640
-    variables(:servers => get_head_nodes)
-    notifies :restart, "service[contrail-schema]", :immediately
-end
-
-template "/etc/contrail/svc-monitor.conf" do
-    source "contrail-svc-monitor.conf.erb"
-    owner "contrail"
-    group "contrail"
-    mode 00640
-    variables(:servers => get_head_nodes)
-    notifies :restart, "service[contrail-svc-monitor]", :immediately
-end
-
-%w{contrail-analytics-api
-   contrail-collector
-   contrail-query-engine}.each do |pkg|
+%w{ discovery
+    dns
+    svc-monitor
+}.each do |pkg|
     template "/etc/contrail/#{pkg}.conf" do
-        source "#{pkg}.conf.erb"
+        source "contrail-#{pkg}.conf.erb"
         owner "contrail"
         group "contrail"
         mode 00640
         variables(:servers => get_head_nodes)
-        notifies :restart, "service[#{pkg}]", :immediately
+        notifies :restart, "service[contrail-#{pkg}]", :immediately
     end
 end
 
@@ -118,24 +84,33 @@ template "/etc/contrail/control-node.conf" do
     notifies :restart, "service[contrail-control]", :immediately
 end
 
-template "/etc/contrail/dns.conf" do
-    source "contrail-dns.conf.erb"
-    owner "contrail"
-    group "contrail"
-    mode 00640
-    notifies :restart, "service[contrail-dns]", :immediately
+%w{ contrail-api
+    contrail-schema
+    contrail-analytics-api
+    contrail-collector
+    contrail-query-engine
+}.each do |pkg|
+    template "/etc/contrail/#{pkg}.conf" do
+        source "#{pkg}.conf.erb"
+        owner "contrail"
+        group "contrail"
+        mode 00640
+        variables(:servers => get_head_nodes)
+        notifies :restart, "service[#{pkg}]", :immediately
+    end
 end
 
-%w{ifmap-server
-   contrail-discovery
-   contrail-api
-   contrail-schema
-   contrail-svc-monitor
-   contrail-analytics-api
-   contrail-collector
-   contrail-query-engine
-   contrail-control
-   contrail-dns}.each do |pkg|
+%w{ ifmap-server
+    contrail-discovery
+    contrail-api
+    contrail-schema
+    contrail-svc-monitor
+    contrail-analytics-api
+    contrail-collector
+    contrail-query-engine
+    contrail-control
+    contrail-dns
+}.each do |pkg|
     service pkg do
         action [:enable, :start]
     end
