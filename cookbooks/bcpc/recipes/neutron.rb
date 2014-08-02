@@ -20,13 +20,6 @@
 include_recipe "bcpc::mysql"
 include_recipe "bcpc::openstack"
 
-ruby_block "initialize-neutron-config" do
-    block do
-        make_config('mysql-neutron-user', "neutron")
-        make_config('mysql-neutron-password', secure_password)
-    end
-end
-
 %w{neutron-server neutron-plugin-contrail}.each do |pkg|
     package pkg do
         action :upgrade
@@ -76,16 +69,4 @@ template "/etc/neutron/plugins/opencontrail/ContrailPlugin.ini" do
     group "root"
     mode 00644
     notifies :restart, "service[neutron-server]", :immediately
-end
-
-ruby_block "neutron-database-creation" do
-    block do
-        if not system "mysql -uroot -p#{get_config('mysql-root-password')} -e 'SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = \"#{node['bcpc']['neutron_dbname']}\"'|grep \"#{node['bcpc']['neutron_dbname']}\"" then
-            %x[ mysql -uroot -p#{get_config('mysql-root-password')} -e "CREATE DATABASE #{node['bcpc']['neutron_dbname']};"
-                mysql -uroot -p#{get_config('mysql-root-password')} -e "GRANT ALL ON #{node['bcpc']['neutron_dbname']}.* TO '#{get_config('mysql-neutron-user')}'@'%' IDENTIFIED BY '#{get_config('mysql-neutron-password')}';"
-                mysql -uroot -p#{get_config('mysql-root-password')} -e "GRANT ALL ON #{node['bcpc']['neutron_dbname']}.* TO '#{get_config('mysql-neutron-user')}'@'localhost' IDENTIFIED BY '#{get_config('mysql-neutron-password')}';"
-                mysql -uroot -p#{get_config('mysql-root-password')} -e "FLUSH PRIVILEGES;"
-            ]
-        end
-    end
 end

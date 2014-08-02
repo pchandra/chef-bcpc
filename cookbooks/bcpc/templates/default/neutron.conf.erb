@@ -333,7 +333,7 @@ signing_dir = /var/lib/neutron
 # connection = mysql://root:pass@127.0.0.1:3306/neutron
 # Replace 127.0.0.1 above with the IP address of the database used by the
 # main neutron server. (Leave it as is if the database runs on this host.)
-connection = mysql://<%=get_config('mysql-neutron-user')%>:<%=get_config('mysql-neutron-password')%>@<%=node['bcpc']['management']['vip']%>/<%=node['bcpc']['neutron_dbname']%>
+connection = sqlite:////var/lib/neutron/neutron.sqlite
 
 # The SQLAlchemy connection string used to connect to the slave database
 # slave_connection =
