@@ -17,7 +17,7 @@ zk_server_ip = <%= @servers.collect{|x| x['bcpc']['management']['ip']+':2181'}.j
 [KEYSTONE]
 auth_host = <%=node['bcpc']['management']['vip']%>
 auth_port = 35357
-auth_protocol = https
+auth_protocol = <%=node['bcpc']['protocol']['keystone']%>
 admin_tenant_name = <%=node['bcpc']['admin_tenant']%>
 admin_user = <%=get_config('keystone-admin-user')%>
 admin_password = <%=get_config('keystone-admin-password')%>

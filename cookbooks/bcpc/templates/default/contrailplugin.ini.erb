@@ -12,4 +12,4 @@ multi_tenancy = True
 admin_tenant_name = <%=node['bcpc']['admin_tenant']%>
 admin_user = <%=get_config('keystone-admin-user')%>
 admin_password = <%=get_config('keystone-admin-password')%>
-auth_url = https://<%=node['bcpc']['management']['vip']%>:35357/v2.0
+auth_url = <%=node['bcpc']['protocol']['keystone']%>://<%=node['bcpc']['management']['vip']%>:35357/v2.0
