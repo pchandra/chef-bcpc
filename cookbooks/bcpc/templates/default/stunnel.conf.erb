@@ -74,6 +74,12 @@ accept  = <%=node['bcpc']['management']['ip']%>:9191
 connect = 127.0.0.1:9191
 <% end -%>
 
+<% if node['bcpc']['protocol']['neutron'] == 'https' -%>
+[neutron-api]
+accept  = <%=node['bcpc']['management']['ip']%>:9696
+connect = 127.0.0.1:9696
+<% end -%>
+
 <% if node['bcpc']['protocol']['heat'] == 'https' -%>
 [heat-api]
 accept  = <%=node['bcpc']['management']['ip']%>:8004

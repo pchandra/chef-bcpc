@@ -247,9 +247,9 @@ bash "keystone-service-catalog-neutron" do
         . /root/keystonerc
         export NEUTRON_ID=`keystone service-create --name=neutron --type=network --description="Neutron Service" | grep " id " | awk '{print $4}'`
         keystone endpoint-create --region #{node['bcpc']['region_name']} --service_id $NEUTRON_ID \
-            --publicurl   "http://#{node['bcpc']['management']['vip']}:9696/" \
-            --adminurl    "http://#{node['bcpc']['management']['vip']}:9696/" \
-            --internalurl "http://#{node['bcpc']['management']['vip']}:9696/"
+            --publicurl   "#{node['bcpc']['protocol']['neutron']}://#{node['bcpc']['management']['vip']}:9696/" \
+            --adminurl    "#{node['bcpc']['protocol']['neutron']}://#{node['bcpc']['management']['vip']}:9696/" \
+            --internalurl "#{node['bcpc']['protocol']['neutron']}://#{node['bcpc']['management']['vip']}:9696/"
     EOH
     only_if ". /root/keystonerc; keystone service-get neutron 2>&1 | grep -e '^No service'"
 end

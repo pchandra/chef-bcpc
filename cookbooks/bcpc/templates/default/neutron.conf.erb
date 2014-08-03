@@ -38,7 +38,7 @@ lock_path = $state_path/lock
 # publish_errors = False
 
 # Address to bind the API server to
-bind_host = <%=node['bcpc']['management']['ip']%>
+bind_host = <%= (node['bcpc']['protocol']['neutron'] == 'https') ? "127.0.0.1" : node['bcpc']['management']['ip'] %>
 
 # Port the bind the API server to
 # bind_port = 9696
