@@ -101,6 +101,24 @@ end
     end
 end
 
+template "/var/lib/contrail-webui-bundle/keys/cs-cert.pem" do
+    source "ssl-bcpc.pem.erb"
+    owner "contrail"
+    group "contrail"
+    mode 00644
+    notifies :restart, "service[contrail-webui-jobserver]", :delayed
+    notifies :restart, "service[contrail-webui-webserver]", :delayed
+end
+
+template "/var/lib/contrail-webui-bundle/keys/cs-key.pem" do
+    source "ssl-bcpc.key.erb"
+    owner "contrail"
+    group "contrail"
+    mode 00600
+    notifies :restart, "service[contrail-webui-jobserver]", :delayed
+    notifies :restart, "service[contrail-webui-webserver]", :delayed
+end
+
 template "/etc/contrail-webui-bundle/config.global.js" do
     source "contrail-config.global.js.erb"
     owner "contrail"
