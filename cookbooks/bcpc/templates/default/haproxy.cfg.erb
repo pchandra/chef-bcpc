@@ -159,6 +159,15 @@ listen opencontrail-api <%=node['bcpc']['management']['vip']%>:8082
   <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:8082 check inter 1s rise 1 fall 1" %>
 <% end -%>
 
+listen opencontrail-analytics-api <%=node['bcpc']['management']['vip']%>:8081
+  balance  source
+  option  tcplog
+  option httpchk GET /
+  http-check expect status 200
+<% @servers.each do |server| -%>
+  <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:8081 check inter 1s rise 1 fall 1" %>
+<% end -%>
+
 listen opencontrail-discovery <%=node['bcpc']['management']['vip']%>:5998
   balance  source
   option  tcplog
