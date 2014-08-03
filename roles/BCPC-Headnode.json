@@ -25,6 +25,7 @@
       "recipe[bcpc::glance]",
       "recipe[bcpc::cinder]",
       "recipe[bcpc::contrail-head]",
+      "recipe[bcpc::neutron]",
       "recipe[bcpc::nova-head]",
       "recipe[bcpc::heat]",
       "recipe[bcpc::horizon]",
