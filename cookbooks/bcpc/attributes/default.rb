@@ -144,6 +144,7 @@ default['bcpc']['repos']['cassandra'] = "http://www.apache.org/dist/cassandra/de
 default['bcpc']['repos']['redis-server'] = "http://ppa.launchpad.net/chris-lea/redis-server/ubuntu"
 default['bcpc']['repos']['python-hiredis'] = "http://ppa.launchpad.net/chris-lea/python-hiredis/ubuntu"
 default['bcpc']['repos']['python-redis'] = "http://ppa.launchpad.net/chris-lea/python-redis/ubuntu"
+default['bcpc']['repos']['contrail'] = "http://ppa.launchpad.net/opencontrail/ppa/ubuntu"
 
 ###########################################
 #

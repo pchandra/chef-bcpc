@@ -35,6 +35,14 @@
 				<a href="https://openstack.<%=node['bcpc']['domain_name']%>/horizon">https://openstack.<%=node['bcpc']['domain_name']%>/horizon</a>
 			</div>
 			<div class="block">
+				<label>Contrail</label>
+				<a href="https://<%=node['bcpc']['management']['vip']%>:8143">https://<%=node['bcpc']['management']['vip']%>:8143</a>
+			</div>
+			<div class="block">
+				<label>Contrail Discovery</label>
+				<a href="http://<%=node['bcpc']['management']['vip']%>:5998/services">http://<%=node['bcpc']['management']['vip']%>:5998/services</a>
+			</div>
+			<div class="block">
 				<label>HAProxy</label>
 				<a href="https://<%=node['bcpc']['management']['vip']%>/haproxy">https://<%=node['bcpc']['management']['vip']%>/haproxy</a>
 			</div>
