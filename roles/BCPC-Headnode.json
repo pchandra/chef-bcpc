@@ -16,6 +16,7 @@
       "recipe[bcpc::mysql]",
       "recipe[bcpc::rabbitmq]",
       "recipe[bcpc::389ds]",
+      "recipe[bcpc::zookeeper]",
       "recipe[bcpc::haproxy]",
       "recipe[bcpc::keepalived]",
       "recipe[bcpc::keystone]",
