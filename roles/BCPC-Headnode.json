@@ -18,6 +18,7 @@
       "recipe[bcpc::389ds]",
       "recipe[bcpc::zookeeper]",
       "recipe[bcpc::cassandra]",
+      "recipe[bcpc::redis]",
       "recipe[bcpc::haproxy]",
       "recipe[bcpc::keepalived]",
       "recipe[bcpc::keystone]",
