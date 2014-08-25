@@ -30,8 +30,6 @@ default['bcpc']['enabled']['logging'] = true
 default['bcpc']['enabled']['metrics'] = true
 # This will enable zabbix server on head nodes and zabbix agent on all nodes
 default['bcpc']['enabled']['monitoring'] = true
-# This will enable powerdns on head nodes
-default['bcpc']['enabled']['dns'] = true
 # This will enable iptables firewall on all nodes
 default['bcpc']['enabled']['host_firewall'] = true
 # This will enable of encryption of the chef data bag
@@ -167,7 +165,6 @@ default['bcpc']['dbname']['keystone'] = "keystone"
 default['bcpc']['dbname']['heat'] = "heat"
 default['bcpc']['dbname']['ceilometer'] = "ceilometer"
 default['bcpc']['dbname']['graphite'] = "graphite"
-default['bcpc']['dbname']['pdns'] = "pdns"
 default['bcpc']['dbname']['zabbix'] = "zabbix"
 
 default['bcpc']['admin_tenant'] = "AdminTenant"

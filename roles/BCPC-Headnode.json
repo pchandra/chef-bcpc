@@ -29,7 +29,6 @@
       "recipe[bcpc::nova-head]",
       "recipe[bcpc::heat]",
       "recipe[bcpc::horizon]",
-      "recipe[bcpc::powerdns]",
       "recipe[bcpc::graphite]",
       "recipe[bcpc::elasticsearch]",
       "recipe[bcpc::kibana]",
