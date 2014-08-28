@@ -86,6 +86,19 @@ template "/etc/ssl/certs/ssl-bcpc.pem" do
     mode 00644
 end
 
+template "/usr/local/share/ca-certificates/ssl-bcpc.crt" do
+    source "ssl-bcpc.pem.erb"
+    owner "root"
+    group "root"
+    mode 00644
+    notifies :run, "execute[reload-ca-certificates]", :immediately
+end
+
+execute "reload-ca-certificates" do
+    action :nothing
+    command "update-ca-certificates"
+end
+
 directory "/etc/ssl/private" do
     owner "root"
     group "root"
