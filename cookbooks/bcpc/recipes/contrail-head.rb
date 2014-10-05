@@ -35,8 +35,9 @@ end
     contrail-config-openstack
     contrail-analytics
     contrail-control
+    contrail-dns
     contrail-utils
-    contrail-webui-bundle
+    contrail-web-controller
 }.each do |pkg|
     package pkg do
         action :upgrade
@@ -73,7 +74,6 @@ template "/etc/contrail/vnc_api_lib.ini" do
 end
 
 %w{ discovery
-    dns
     svc-monitor
 }.each do |pkg|
     template "/etc/contrail/#{pkg}.conf" do
@@ -84,6 +84,14 @@ end
         variables(:servers => get_head_nodes)
         notifies :restart, "service[contrail-#{pkg}]", :immediately
     end
+end
+
+template "/etc/contrail/dns/dns.conf" do
+    source "contrail-dns.conf.erb"
+    owner "contrail"
+    group "contrail"
+    mode 00640
+    notifies :restart, "service[contrail-dns]", :immediately
 end
 
 template "/etc/contrail/control-node.conf" do
@@ -110,7 +118,7 @@ end
     end
 end
 
-template "/var/lib/contrail-webui-bundle/keys/cs-cert.pem" do
+template "/var/lib/contrail-webui/contrail-web-core/keys/cs-cert.pem" do
     source "ssl-bcpc.pem.erb"
     owner "contrail"
     group "contrail"
@@ -119,7 +127,7 @@ template "/var/lib/contrail-webui-bundle/keys/cs-cert.pem" do
     notifies :restart, "service[contrail-webui-webserver]", :delayed
 end
 
-template "/var/lib/contrail-webui-bundle/keys/cs-key.pem" do
+template "/var/lib/contrail-webui/contrail-web-core/keys/cs-key.pem" do
     source "ssl-bcpc.key.erb"
     owner "contrail"
     group "contrail"
@@ -128,7 +136,7 @@ template "/var/lib/contrail-webui-bundle/keys/cs-key.pem" do
     notifies :restart, "service[contrail-webui-webserver]", :delayed
 end
 
-template "/etc/contrail-webui-bundle/config.global.js" do
+template "/etc/contrail/config.global.js" do
     source "contrail-config.global.js.erb"
     owner "contrail"
     group "contrail"
