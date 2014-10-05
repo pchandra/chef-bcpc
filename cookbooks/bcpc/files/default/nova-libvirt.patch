@@ -2249,7 +2249,7 @@ index f66b4f2..8c3e28b 100644
          info.driver_format = 'raw'
          info.driver_cache = cache_mode
          info.target_bus = disk_bus
-@@ -647,42 +582,55 @@ class Rbd(Image):
+@@ -647,42 +582,55 @@
          return False
  
      def check_image_exists(self):
@@ -2288,13 +2288,13 @@ index f66b4f2..8c3e28b 100644
 -            args += ['--new-format']
 -        args += self._ceph_args()
 -        libvirt_utils.import_rbd_image(*args)
+-
+-        base_size = disk.get_disk_size(base)
 +        # prepare_template() may have cloned the image into a new rbd
 +        # image already instead of downloading it locally
 +        if not self.check_image_exists():
 +            self.driver.import_image(base, self.rbd_name)
  
--        base_size = disk.get_disk_size(base)
--
 -        if size and size > base_size:
 -            self._resize(self.rbd_name, size)
 +        if size and size > self.get_disk_size(self.rbd_name):
