@@ -17,7 +17,12 @@ def get_nova_floats(username, password, tenant, auth_url):
    of ips. 
    """
    nova = client.Client(username, password, tenant, auth_url, insecure=True)
-   return set( [ str(a.address) for a in nova.floating_ips_bulk.list(os.uname()[1]) ] )
+   h =  nova.hypervisors.search(os.uname()[1], True)[0]
+   iuuids = []
+   if "servers" in dir(h):
+      iuuids = [ str(i["uuid"]) for i in h.servers ]
+
+   return set( [str(f.address)  for f in nova.floating_ips_bulk.list() if f.instance_uuid and str(f.instance_uuid) in iuuids])
             
 def get_iptables_floats(cidr, interface):
    """Parse ip addr, returns a *set* of all ips on interface"""
@@ -37,12 +42,11 @@ def get_iptables_floats(cidr, interface):
             
    return set(ips)
       
-
 if __name__ == '__main__':
    
    import yaml
    import sys
-   config = yaml.load(open(sys.argv[1], "r"))
+   config = yaml.load(open(sys.argv[1], "r"))   
 
    rc = { "result": "OKAY",
           "msg" : "" }
@@ -52,7 +56,7 @@ if __name__ == '__main__':
                                               config["password"],
                                               config["tenant"],
                                               config["auth_url"])
-      bound_floating_ips = get_iptables_floats(config["cidr"], config["interface"])   
+      bound_floating_ips = get_iptables_floats(config["cdir"], config["interface"])   
       problem_ips = bound_floating_ips.difference(assigned_floating_ips)
       if problem_ips:
          rc["result"] = "ERROR"

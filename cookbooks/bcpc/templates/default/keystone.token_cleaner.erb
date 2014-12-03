@@ -1,0 +1,9 @@
+#!/bin/bash
+
+#
+# Cleans all expired keystone tokens out the database 
+#
+
+logger -t keystone_token_cleaner "Starting token cleanup"
+keystone-manage token_flush
+logger -t keystone_token_cleaner "Ending token cleanup"

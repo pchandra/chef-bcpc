@@ -35,7 +35,7 @@ end
     end
 end
 
-%w{ssl wsgi python php5 proxy_http rewrite}.each do |mod|
+%w{ssl wsgi python php5 proxy_http rewrite cache disk_cache}.each do |mod|
     bash "apache-enable-#{mod}" do
         user "root"
         code "a2enmod #{mod}"

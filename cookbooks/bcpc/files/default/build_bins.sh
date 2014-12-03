@@ -2,6 +2,61 @@
 
 set -x
 
+
+# check that filenames and filetypes for downloads match if they don't
+# match, simply exit (hence no need for faking a return code)
+filecheck() {
+    local VERBOSE=
+
+    local -r FILENAME="$1"
+    local    EXPECTED=""
+
+    if [[ ! -f "$FILENAME" ]]; then
+        echo "Error: $FILENAME not found" >&2
+        exit 1
+    fi
+
+    FILETYPE=`file $FILENAME`
+
+    if [[ `basename $FILENAME` == *tgz || `basename $FILENAME` == *tar.gz ]]; then
+        EXPECTED="gzip compressed data"
+    fi
+
+    if [[ `basename $FILENAME` == *.deb ]]; then
+        EXPECTED="Debian binary package"
+    fi
+
+    if [[ `basename $FILENAME` == *disk*img ]]; then
+        EXPECTED="QEMU QCOW"
+    fi
+
+    if [[ `basename $FILENAME` =~ initrd ]]; then
+        EXPECTED="data"
+    fi
+
+    if [[ `basename $FILENAME` == *.iso ]]; then
+        EXPECTED="CD-ROM filesystem data"
+    fi
+
+    if [[ `basename $FILENAME` =~ vmlinuz ]]; then
+        EXPECTED="Linux kernel x86 boot executable bzImage"
+    fi
+
+    if [[ -n "$EXPECTED" ]] && [[ ! "$FILETYPE" =~ "$EXPECTED" ]]; then
+        echo "Error: $FILENAME is not of type $EXPECTED" >&2
+        exit 1
+    else
+        if [[ -n "$VERBOSE" ]]; then
+            if [[ -n "$EXPECTED" ]]; then
+                echo "pass : expected $EXPECTED, got $FILETYPE"
+            else
+                echo "pass : no check implemented for $FILENAME"
+            fi
+        fi
+    fi
+}
+
+
 # Define the appropriate version of each binary to grab/build
 VER_KIBANA=2581d314f12f520638382d23ffc03977f481c1e4
 # newer versions of Diamond depend upon dh-python which isn't in precise/12.04
@@ -20,6 +75,24 @@ if [ -z "$CURL" ]; then
   CURL=curl
 fi
 
+
+# Checked CURL
+# usage: ccurl filename (new filename)
+#
+# The file is downloaded with default filename, checked for file type
+# matching, then if a second parameter was passed, renamed to that
+ccurl() {
+    $CURL -L -O $1
+    # filecheck will exit if a problem, otherwise it's too much noise
+    set +x
+    filecheck `basename $1`
+    if [[ -n "$2" ]]; then
+        mv `basename $1` $2
+    fi
+    set -x
+}
+
+
 DIR=`dirname $0`
 
 mkdir -p $DIR/bins
@@ -36,11 +109,11 @@ CHEF_CLIENT_URL=https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x
 #CHEF_CLIENT_URL=https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef_11.10.4-1.ubuntu.12.04_amd64.deb
 CHEF_SERVER_URL=https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef-server_11.0.12-1.ubuntu.12.04_amd64.deb
 if [ ! -f chef-client.deb ]; then
-   $CURL -o chef-client.deb ${CHEF_CLIENT_URL}
+   ccurl  ${CHEF_CLIENT_URL} chef-client.deb
 fi
 
 if [ ! -f chef-server.deb ]; then
-   $CURL -o chef-server.deb ${CHEF_SERVER_URL}
+   ccurl  ${CHEF_SERVER_URL} chef-server.deb
 fi
 FILES="chef-client.deb chef-server.deb $FILES"
 
@@ -74,7 +147,7 @@ done
 
 # Fetch the cirros image for testing
 if [ ! -f cirros-0.3.2-x86_64-disk.img ]; then
-    $CURL -O -L http://download.cirros-cloud.net/0.3.2/cirros-0.3.2-x86_64-disk.img
+    ccurl http://download.cirros-cloud.net/0.3.2/cirros-0.3.2-x86_64-disk.img
 fi
 FILES="cirros-0.3.2-x86_64-disk.img $FILES"
 
@@ -82,19 +155,18 @@ FILES="cirros-0.3.2-x86_64-disk.img $FILES"
 if [ ! -f ubuntu-12.04-mini.iso ]; then
     # Download this ISO to get the latest kernel/X LTS stack installer
     #$CURL -o ubuntu-12.04-mini.iso http://archive.ubuntu.com/ubuntu/dists/precise-updates/main/installer-amd64/current/images/raring-netboot/mini.iso
-    $CURL -o ubuntu-12.04-mini.iso http://archive.ubuntu.com/ubuntu/dists/precise/main/installer-amd64/current/images/netboot/mini.iso
+    ccurl  http://archive.ubuntu.com/ubuntu/dists/precise/main/installer-amd64/current/images/netboot/mini.iso ubuntu-12.04-mini.iso
 fi
 FILES="ubuntu-12.04-mini.iso $FILES"
 
 # Grab the CentOS 6 PXE boot images
 if [ ! -f centos-6-initrd.img ]; then
-    #$CURL -o centos-6-mini.iso http://mirror.net.cen.ct.gov/centos/6/isos/x86_64/CentOS-6.4-x86_64-netinstall.iso
-    $CURL -o centos-6-initrd.img http://mirror.net.cen.ct.gov/centos/6/os/x86_64/images/pxeboot/initrd.img
+    ccurl  http://mirror.net.cen.ct.gov/centos/6/os/x86_64/images/pxeboot/initrd.img centos-6-initrd.img
 fi
 FILES="centos-6-initrd.img $FILES"
 
 if [ ! -f centos-6-vmlinuz ]; then
-    $CURL -o centos-6-vmlinuz http://mirror.net.cen.ct.gov/centos/6/os/x86_64/images/pxeboot/vmlinuz
+    ccurl  http://mirror.net.cen.ct.gov/centos/6/os/x86_64/images/pxeboot/vmlinuz centos-6-vmlinuz
 fi
 FILES="centos-6-vmlinuz $FILES"
 
@@ -114,10 +186,10 @@ FILES="diamond.deb $FILES"
 # Snag elasticsearch
 ES_VER=1.1.1
 if [ ! -f elasticsearch-${ES_VER}.deb ]; then
-    $CURL -O -L https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-${ES_VER}.deb
+    ccurl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-${ES_VER}.deb
 fi
 if [ ! -f elasticsearch-${ES_VER}.deb.sha1.txt ]; then
-    $CURL -O -L https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-${ES_VER}.deb.sha1.txt
+    ccurl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-${ES_VER}.deb.sha1.txt
 fi
 if [[ `shasum elasticsearch-${ES_VER}.deb` != `cat elasticsearch-${ES_VER}.deb.sha1.txt` ]]; then
     echo "SHA mismatch detected for elasticsearch ${ES_VER}!"
@@ -139,15 +211,15 @@ FILES="elasticsearch-plugins.tgz $FILES"
 
 # Fetch pyrabbit
 if [ ! -f pyrabbit-1.0.1.tar.gz ]; then
-    $CURL -O -L https://pypi.python.org/packages/source/p/pyrabbit/pyrabbit-1.0.1.tar.gz
+    ccurl https://pypi.python.org/packages/source/p/pyrabbit/pyrabbit-1.0.1.tar.gz
 fi
 FILES="pyrabbit-1.0.1.tar.gz $FILES"
 
 # Build graphite packages
 if [ ! -f python-carbon_0.9.12_all.deb ] || [ ! -f python-whisper_0.9.12_all.deb ] || [ ! -f python-graphite-web_0.9.12_all.deb ]; then
-    $CURL -L -O http://pypi.python.org/packages/source/c/carbon/carbon-0.9.12.tar.gz
-    $CURL -L -O http://pypi.python.org/packages/source/w/whisper/whisper-0.9.12.tar.gz
-    $CURL -L -O http://pypi.python.org/packages/source/g/graphite-web/graphite-web-0.9.12.tar.gz
+    ccurl  http://pypi.python.org/packages/source/c/carbon/carbon-0.9.12.tar.gz
+    ccurl  http://pypi.python.org/packages/source/w/whisper/whisper-0.9.12.tar.gz
+    ccurl  http://pypi.python.org/packages/source/g/graphite-web/graphite-web-0.9.12.tar.gz
     tar zxf carbon-0.9.12.tar.gz
     tar zxf whisper-0.9.12.tar.gz
     tar zxf graphite-web-0.9.12.tar.gz
@@ -160,7 +232,7 @@ FILES="python-carbon_0.9.12_all.deb python-whisper_0.9.12_all.deb python-graphit
 
 # Build the zabbix packages
 if [ ! -f zabbix-agent.tar.gz ] || [ ! -f zabbix-server.tar.gz ]; then
-    $CURL -L -O http://sourceforge.net/projects/zabbix/files/ZABBIX%20Latest%20Stable/2.2.2/zabbix-2.2.2.tar.gz
+    ccurl http://sourceforge.net/projects/zabbix/files/ZABBIX%20Latest%20Stable/2.2.2/zabbix-2.2.2.tar.gz
     tar zxf zabbix-2.2.2.tar.gz
     rm -rf /tmp/zabbix-install && mkdir -p /tmp/zabbix-install
     cd zabbix-2.2.2
@@ -183,7 +255,7 @@ FILES="zabbix-agent.tar.gz zabbix-server.tar.gz $FILES"
 
 # Get some python libs 
 if [ ! -f python-requests-aws_0.1.5_all.deb ]; then
-    $CURL -L -O http://pypi.python.org/packages/source/r/requests-aws/requests-aws-0.1.5.tar.gz
+    ccurl http://pypi.python.org/packages/source/r/requests-aws/requests-aws-0.1.5.tar.gz
     tar zxf requests-aws-0.1.5.tar.gz
     fpm -s python -t deb requests-aws
     rm -rf requests-aws-0.1.5 requests-aws-0.1.5.tar.gz

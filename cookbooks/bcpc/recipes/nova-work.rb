@@ -52,15 +52,41 @@ cookbook_file "/tmp/nova-libvirt.patch" do
     mode 00644
 end
 
-bash "patch-for-nova-libvirt-bugs" do
-    user "root"
-    code <<-EOH
-        cd /usr/lib/python2.7/dist-packages/nova
-        patch -p2 < /tmp/nova-libvirt.patch
-        cp /tmp/nova-libvirt.patch .
-    EOH
-    not_if "test -f /usr/lib/python2.7/dist-packages/nova/nova-libvirt.patch"
+cookbook_file "/tmp/nova-sql.patch" do
+    source "nova-sql.patch"
+    owner "root"
+    mode 00644
 end
+
+#bash "patch-for-nova-libvirt-bugs" do
+#    user "root"
+#    code <<-EOH
+#        cd /usr/lib/python2.7/dist-packages/nova
+#        patch -p2 < /tmp/nova-libvirt.patch
+#        rv=$?
+#        if [ $rv -ne 0 ]; then
+#          echo "Error applying patch ($rv) - aborting!"
+#          exit $rv
+#        fi
+#        cp /tmp/nova-libvirt.patch .
+#    EOH
+#    not_if "test -f /usr/lib/python2.7/dist-packages/nova/nova-libvirt.patch"
+#end
+
+#bash "patch-for-nova-sql-bugs" do
+#    user "root"
+#    code <<-EOH
+#        cd /usr/lib/python2.7/dist-packages/nova
+#        patch -p2 < /tmp/nova-sql.patch
+#        rv=$?
+#        if [ $rv -ne 0 ]; then
+#          echo "Error applying patch ($rv) - aborting!"
+#          exit $rv
+#        fi
+#        cp /tmp/nova-sql.patch .
+#    EOH
+#    not_if "test -f /usr/lib/python2.7/dist-packages/nova/nova-sql.patch"
+#end
 
 directory "/var/lib/nova/.ssh" do
     owner "nova"
@@ -104,6 +130,16 @@ bash "enable-defaults-libvirt-bin" do
         echo 'libvirtd_opts=\"-d -l\"' >> /etc/default/libvirt-bin
     EOH
     not_if "grep -e '^libvirtd_opts=\"-d -l\"' /etc/default/libvirt-bin"
+    notifies :restart, "service[libvirt-bin]", :delayed
+end
+
+bash "set-libvirt-bin-ulimit" do
+    user "root"
+    code <<-EOH
+        sed --in-place '/^ulimit/d' /etc/default/libvirt-bin
+        echo "ulimit -n #{node['bcpc']['libvirt-bin']['ulimit']['nofile']}" >> /etc/default/libvirt-bin
+    EOH
+    not_if "grep -e \"^ulimit -n #{node['bcpc']['libvirt-bin']['ulimit']['nofile']}$\" /etc/default/libvirt-bin"
     notifies :restart, "service[libvirt-bin]", :delayed
 end
 

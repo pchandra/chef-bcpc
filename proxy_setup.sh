@@ -23,6 +23,7 @@ if [ -n "$PROXY" ]; then
    $CURL -s --connect-timeout 1 http://www.ubuntu.com > /dev/null
    if [[ $? != 0 ]]; then
        echo "Error: proxy $PROXY not responding"
+       exit 1
    else
        echo "Using a proxy at $PROXY"
    fi   

@@ -4,4 +4,4 @@
 # node. For example see below. Currently none should be needed
 #service glance-api       restart
 #service glance-registry  restart
-#chef-client
+chef-client

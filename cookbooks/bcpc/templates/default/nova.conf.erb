@@ -14,7 +14,7 @@ sql_idle_timeout=3600
 rabbit_host=<%=node['bcpc']['management']['vip']%>
 rabbit_password=<%=get_config('rabbitmq-password')%>
 rabbit_ha_queues=False
-rabbit_durable_queues=True
+rabbit_durable_queues=False
 
 # If using qpid...
 #rpc_backend=nova.openstack.common.rpc.impl_qpid
@@ -42,6 +42,9 @@ osapi_compute_extension=cobalt.nova.osapi.cobalt_extension.Cobalt_extension
 
 # Nova Scheduler
 scheduler_driver=nova.scheduler.filter_scheduler.FilterScheduler
+ram_allocation_ratio=<%=node['bcpc']['nova']['ram_allocation_ratio']%>
+reserved_host_memory_mb=<%=node['bcpc']['nova']['reserved_host_memory_mb']%>
+cpu_allocation_ratio=<%=node['bcpc']['nova']['cpu_allocation_ratio']%>
 
 # Neutron settings
 network_api_class=nova.network.neutronv2.api.API
@@ -99,11 +102,11 @@ use_project_ca=True
 cnt_vpn_clients=5
 
 # Ceilometer metrics
-instance_usage_audit=True
-instance_usage_audit_period=hour
-notify_on_state_change=vm_and_task_state
-notification_driver=nova.openstack.common.notifier.rpc_notifier
-notification_driver=ceilometer.compute.nova_notifier
+#instance_usage_audit=True
+#instance_usage_audit_period=hour
+#notify_on_state_change=vm_and_task_state
+#notification_driver=nova.openstack.common.notifier.rpc_notifier
+#notification_driver=ceilometer.compute.nova_notifier
 
 # Misc other settings
 logdir=/var/log/nova

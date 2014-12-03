@@ -12,6 +12,8 @@ default['bcpc']['openstack_release'] = "icehouse"
 default['bcpc']['openstack_branch'] = "proposed"
 # Should be kvm (or qemu if testing in VMs that don't support VT-x)
 default['bcpc']['virt_type'] = "kvm"
+# ulimits for libvirt-bin
+default['bcpc']['libvirt-bin']['ulimit']['nofile'] = 4096
 # Region name for this cluster
 default['bcpc']['region_name'] = node.chef_environment
 # Domain name for this cluster (used in many configs)
@@ -40,10 +42,15 @@ default['bcpc']['enabled']['apt_upgrade'] = false
 default['bcpc']['enabled']['keepalived_checks'] = true
 # This will enable the networking test scripts
 default['bcpc']['enabled']['network_tests'] = true
+# This will enable httpd disk caching for radosgw
+default['bcpc']['enabled']['radosgw_cache'] = false
 
 # This can be either 'sql' or 'ldap' to either store identities
 # in the mysql DB or the LDAP server
 default['bcpc']['keystone']['backend'] = 'ldap'
+
+# If radosgw_cache is enabled, default to 20MB max file size
+default['bcpc']['radosgw']['cache_max_file_size'] = 20000000
 
 ###########################################
 #
@@ -187,3 +194,16 @@ default['bcpc']['protocol']['nova'] = "https"
 default['bcpc']['protocol']['cinder'] = "https"
 default['bcpc']['protocol']['neutron'] = "https"
 default['bcpc']['protocol']['heat'] = "https"
+
+###########################################
+#
+#  Nova Settings
+#
+###########################################
+#
+# Over-allocation settings. Set according to your cluster
+# SLAs. Default is to not allow over allocation of memory
+# a slight over allocation of CPU (x2). 
+default['bcpc']['nova']['ram_allocation_ratio'] = 1.0
+default['bcpc']['nova']['reserved_host_memory_mb'] = 1024
+default['bcpc']['nova']['cpu_allocation_ratio'] = 2.0

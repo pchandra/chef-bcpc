@@ -56,7 +56,7 @@ def run_test(stack_test, config):
          result["value"] = rr["result"]
          result["message"] = rr["msg"]
 
-      except ValueError as ve:
+      except yaml.parser.ParserError as ve:
          result["value"] = "ERROR"
          result["message"] = "Failed to parse stdout:" + ve.message
    elif not result["value"]:
@@ -172,7 +172,7 @@ if __name__ == '__main__':
     import os
     parser = OptionParser(usage="%prog [options]", version="%prog 0.1")
     parser.add_option("-f", "--format", dest="format", type="choice",
-                      choices=["table", "timeonly", "raw", "json"], default="raw",
+                      choices=["table", "timeonly", "raw", "json"], default="table",
                       help="the report format")
     parser.add_option("--debug", dest="debug", action="store_true",
                       default=False,

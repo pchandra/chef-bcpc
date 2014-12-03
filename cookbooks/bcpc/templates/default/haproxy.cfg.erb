@@ -6,29 +6,30 @@
 
 global
   daemon
-  user  haproxy
-  group  haproxy
-  pidfile  /var/run/haproxy.pid
+  user haproxy
+  group haproxy
+  pidfile /var/run/haproxy.pid
+  stats socket /var/run/haproxy/haproxy.asok level admin
   log /dev/log local0 info
+  maxconn 8000
 
 defaults
-  log  global
-  maxconn  8000
+  log global
   source <%=node['bcpc']['management']['vip']%>
-  mode  http
+  mode http
   option http-server-close
   option abortonclose
   option tcplog
   option dontlognull
   option nolinger
-  option  redispatch
-  retries  3
-  timeout  http-request 10s
-  timeout  queue 1m
-  timeout  connect 5s
-  timeout  check 10s
-  timeout  client 30m
-  timeout  server 30m
+  option redispatch
+  retries 3
+  timeout http-request 10s
+  timeout queue 1m
+  timeout connect 5s
+  timeout check 10s
+  timeout client 30m
+  timeout server 30m
 
 listen memcached <%=node['bcpc']['management']['vip']%>:11211
   mode tcp
@@ -36,23 +37,23 @@ listen memcached <%=node['bcpc']['management']['vip']%>:11211
   server myself 127.0.0.1:11211
 
 listen mysql-galera <%=node['bcpc']['management']['vip']%>:3306
-  timeout  client 24h
-  timeout  server 24h
+  timeout client 24h
+  timeout server 24h
   mode tcp
   balance leastconn
-  option  tcplog
+  option tcplog
   option tcpka
   option httpchk
 <% @servers.each do |server| -%>
-  <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:3306 check port 3307 inter 5s rise 1 fall 1 observe layer4" %>
+  <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:3306 check port 3307 inter 5s rise 1 fall 1 observe layer4 backup" %>
 <% end -%>
 
 listen rabbitmq-amqp <%=node['bcpc']['management']['vip']%>:5672
-  timeout  client 24h
-  timeout  server 24h
+  timeout client 24h
+  timeout server 24h
   mode tcp
   balance leastconn
-  option  tcplog
+  option tcplog
   option tcpka
   option httpchk
 <% @servers.each do |server| -%>
@@ -60,11 +61,11 @@ listen rabbitmq-amqp <%=node['bcpc']['management']['vip']%>:5672
 <% end -%>
 
 listen ldap-389ds <%=node['bcpc']['management']['vip']%>:389
-  timeout  client 1h
-  timeout  server 1h
+  timeout client 1h
+  timeout server 1h
   mode tcp
   balance leastconn
-  option  tcplog
+  option tcplog
   option tcpka
 <% @servers.each do |server| -%>
   <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:389 check inter 5s rise 1 fall 1 observe layer4" %>
@@ -218,13 +219,11 @@ listen ceilometer-api
 
 frontend http
   bind <%=node['bcpc']['management']['vip']%>:80
-  balance source
   option tcplog
   default_backend http-backend
 
 frontend https
   bind <%=node['bcpc']['management']['vip']%>:443 ssl crt /etc/haproxy/haproxy.pem
-  balance source
   option tcplog
   stats enable
   stats uri /haproxy
@@ -247,6 +246,7 @@ frontend https
   default_backend http-backend
 
 backend http-backend
+  balance source
   option httpchk GET /
   http-check expect status 200
 <% @servers.each do |server| -%>
@@ -254,6 +254,7 @@ backend http-backend
 <% end -%>
 
 backend horizon-backend
+  balance source
   option httpchk GET /
   http-check expect status 200
 <% @servers.each do |server| -%>
@@ -261,6 +262,7 @@ backend horizon-backend
 <% end -%>
 
 backend rabbitmq-web-backend
+  balance source
   option httpchk GET /
   http-check expect status 200
   reqrep ^([^\ :]*)\ /rabbitmq/(.*) \1\ /\2
@@ -269,6 +271,7 @@ backend rabbitmq-web-backend
 <% end -%>
 
 backend kibana-backend
+  balance source
   option httpchk GET /
   http-check expect status 200
   reqrep ^([^\ :]*)\ /kibana/(.*) \1\ /\2
@@ -277,6 +280,7 @@ backend kibana-backend
 <% end -%>
 
 backend zabbix-backend
+  balance source
   option httpchk GET /
   http-check expect status 200
   reqrep ^([^\ :]*)\ /zabbix/(.*) \1\ /\2
@@ -285,6 +289,7 @@ backend zabbix-backend
 <% end -%>
 
 backend graphite-backend
+  balance source
   option httpchk GET /
   http-check expect status 200
   reqrep ^([^\ :]*)\ /graphite/(.*) \1\ /\2
@@ -295,13 +300,12 @@ backend graphite-backend
 # This is temporary until graphite supports being served under /graphite
 frontend graphite
   bind <%="#{node['bcpc']['management']['vip']}:8888"%> ssl crt /etc/haproxy/haproxy.pem
-  balance source
   option tcplog
   default_backend graphite-backend
 
 listen elasticsearch <%=node['bcpc']['management']['vip']%>:9200
-  balance  source
-  option  tcplog
+  balance source
+  option tcplog
   option httpchk GET /
   http-check expect status 200
 <% @servers.each do |server| -%>
@@ -310,17 +314,16 @@ listen elasticsearch <%=node['bcpc']['management']['vip']%>:9200
 
 frontend radosgw-http
   bind <%="#{node['bcpc']['floating']['vip']}:#{node['bcpc']['ports']['haproxy']['radosgw']}"%>
-  balance leastconn
   option tcplog
   default_backend radosgw-http-backend
 
 frontend radosgw-https
   bind <%="#{node['bcpc']['floating']['vip']}:#{node['bcpc']['ports']['haproxy']['radosgw_https']}"%> ssl crt /etc/haproxy/haproxy.pem
-  balance leastconn
   option tcplog
   default_backend radosgw-http-backend
 
 backend radosgw-http-backend
+  balance leastconn
   option httpchk GET /
   http-check expect status 200
   source <%=node['bcpc']['floating']['vip']%>

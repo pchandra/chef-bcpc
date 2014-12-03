@@ -29,7 +29,7 @@ sql_idle_timeout=3600
 rabbit_host=<%=node['bcpc']['management']['vip']%>
 rabbit_password=<%=get_config('rabbitmq-password')%>
 rabbit_ha_queues=False
-rabbit_durable_queues=True
+rabbit_durable_queues=False
 
 # If using qpid...
 #rpc_backend=cinder.openstack.common.rpc.impl_qpid
@@ -46,8 +46,8 @@ glance_api_version=2
 enabled_backends=<%= node['bcpc']['ceph']['enabled_pools'].map {|type| type.upcase}.join(",") %>
 
 # Ceilometer metrics
-control_exchange = cinder
-notification_driver = cinder.openstack.common.notifier.rpc_notifier
+#control_exchange = cinder
+#notification_driver = cinder.openstack.common.notifier.rpc_notifier
 
 [ssl]
 ca_file = /etc/ssl/certs/ssl-bcpc.pem

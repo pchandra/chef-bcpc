@@ -43,6 +43,7 @@ class TestNovaCompute(object):
     raise Exception("unable to delete server")  
 
   def run(self):
+    import glob
     #
     # clean up last (failed?) test    
     #
@@ -51,9 +52,9 @@ class TestNovaCompute(object):
             self._delete_server(server)
                 
   
-    image_name = self.config.get("image_name", "Cirros 0.3.0 x86_64")
-    images = [ i for i in self.client.images.list() if i.name == image_name ] 
-    if len(images)!=1:
+    image_name = self.config.get("image_name", "Cirros*")
+    images = [ i for i in self.client.images.list() if glob.fnmatch.fnmatch(i.name, image_name) ] 
+    if len(images)==0:
           raise Exception("Found %d images called %s"  %(len(images), image_name))
 
     flavor_name =  self.config.get("flavor", "m1.small")

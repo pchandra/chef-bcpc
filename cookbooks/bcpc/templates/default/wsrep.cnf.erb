@@ -13,9 +13,6 @@
 #  - wsrep_sst_auth
 # The rest of defaults should work out of the box.
 
-[mysqld_safe]
-wsrep_urls="<%= "#{@servers.collect{|x| 'gcomm://'+x['bcpc']['management']['ip']+':4567'}.join(',')},#{@seed}" %>"
-
 ##
 ## mysqld options _MANDATORY_ for correct opration of the cluster
 ##
@@ -72,6 +69,9 @@ character-set-server = utf8
 ##
 ## WSREP options
 ##
+
+<% @servers.delete(node) -%>
+wsrep_cluster_address=gcomm://<%="#{@servers.collect{|x| x['bcpc']['management']['ip']}.join(',')}"%>
 
 # Full path to wsrep provider library or 'none'
 wsrep_provider=/usr/lib/libgalera_smm.so
@@ -141,7 +141,7 @@ wsrep_notify_cmd=
 ##
 
 # State Snapshot Transfer method
-wsrep_sst_method=xtrabackup
+wsrep_sst_method=xtrabackup-v2
 
 # Address on THIS node to receive SST at. DON'T SET IT TO DONOR ADDRESS!!!
 # (SST method dependent. Defaults to the first IP of the first interface)

@@ -30,14 +30,21 @@ if [[ ! -f "environments/$ENVIRONMENT.json" ]]; then
     exit 1
 fi
 
+declare -A FQDNS
 
 while read HOST MACADDR IPADDR ILOIPADDR DOMAIN ROLE; do
-    if [[ -z "$EXACTHOST" || "$EXACTHOST" = "$HOST" || "$EXACTHOST" = "$IPADDR" || "$EXACTHOST" = "heads" && "$ROLE" = "head" || "$EXACTHOST" = "workers" && "$ROLE" = "work" ]]; then
-	if   [[ "$ROLE" = head ]]; then
-	    HEADS="$HEADS $IPADDR"
-	elif [[ "$ROLE" = work ]]; then
-	    WORKERS="$WORKERS $IPADDR"
-	fi	
+    if [[ -z "$EXACTHOST" || "$EXACTHOST" = all || "$EXACTHOST" = "$HOST" || "$EXACTHOST" = "$IPADDR" || "$EXACTHOST" = "heads" && "$ROLE" = "head" || "$EXACTHOST" = "workers" && "$ROLE" = "work" ]]; then
+        IDX=`echo $IPADDR | tr '.' '-'`
+        if [[ "$ROLE" = "bootstrap" ]]; then
+            continue
+        fi
+        if   [[ "$ROLE" = head ]]; then
+            HEADS="$HEADS $IPADDR"
+            FQDNS["$IDX"]="${HOST}.${DOMAIN}"
+        elif [[ "$ROLE" = work ]]; then
+            WORKERS="$WORKERS $IPADDR"
+            FQDNS["$IDX"]="${HOST}.${DOMAIN}"
+        fi  
     fi
 done < cluster.txt
 echo "heads : $HEADS"
@@ -45,22 +52,33 @@ echo "workers : $WORKERS"
 
 PASSWD=`knife data bag show configs $ENVIRONMENT | grep "cobbler-root-password:" | awk ' {print $2}'`
 
+# Head nodes use an unbundled initialisation - chef is installed from
+# a .deb (allowing disconnected working) and then the node is
+# bootstrapped with no role to start, and then it is made admin, and
+# then the role is assigned, finally chef-client is run
 for HEAD in $HEADS; do
     MATCH=$HEAD
     echo "About to bootstrap head node $HEAD..."
     ./chefit.sh $HEAD $ENVIRONMENT
-    echo $PASSWD | sudo knife bootstrap -E $ENVIRONMENT -r 'role[BCPC-Headnode]' $HEAD -x ubuntu  -P $PASSWD --sudo
+    echo $PASSWD | sudo knife bootstrap -E $ENVIRONMENT $HEAD -x ubuntu  -P $PASSWD --sudo
+    IDX=`echo $HEAD | tr '.' '-'`
+    FQDN=${FQDNS["$IDX"]}
+    ./make-admin.sh $FQDN
+    knife node run_list add $FQDN 'role[BCPC-Headnode]'
     SSHCMD="./nodessh.sh $ENVIRONMENT $HEAD"
-    $SSHCMD "/home/ubuntu/finish-head.sh" sudo	
+    $SSHCMD "/home/ubuntu/finish-head.sh" sudo  
 done
+# Work nodes are simpler than head nodes. After installation of Chef
+# we can let knife bootstrap do the rest.
 for WORKER in $WORKERS; do
     MATCH=$WORKER
     echo "About to bootstrap worker worker $WORKER..."
     ./chefit.sh $WORKER $ENVIRONMENT
     echo $PASSWD | sudo knife bootstrap -E $ENVIRONMENT -r 'role[BCPC-Worknode]' $WORKER -x ubuntu -P $PASSWD --sudo
     SSHCMD="./nodessh.sh $ENVIRONMENT $WORKER"
-    $SSHCMD "/home/ubuntu/finish-worker.sh" sudo	
+    $SSHCMD "/home/ubuntu/finish-worker.sh" sudo    
 done
 if [[ -z "$MATCH" ]]; then
     echo "Warning: No nodes found"
 fi
+

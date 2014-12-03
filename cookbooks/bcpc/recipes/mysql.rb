@@ -83,28 +83,11 @@ end
 template "/etc/mysql/conf.d/wsrep.cnf" do
     source "wsrep.cnf.erb"
     mode 00644
-    notifies :restart, "service[mysql]", :immediately
-    results = get_head_nodes
-    # If we are the first one, special case
-    seed = ""
-    if ((results.length == 1) && (results[0]['hostname'] == node['hostname'])) then
-        seed = "gcomm://"
-        # Commented out to prevent mysql from always restarting when 1 head-node
-        notifies :run, "bash[remove-bare-gcomm]", :delayed
-    end
     variables(
-        :seed => seed,
         :max_connections => [get_head_nodes.length*50+get_all_nodes.length*5, 200].max,
-        :servers => results
+        :servers => get_head_nodes
     )
-end
-
-bash "remove-bare-gcomm" do
-    action :nothing
-    user "root"
-    code <<-EOH
-        sed --in-place 's/^\\(wsrep_urls=.*\\),gcomm:\\/\\/"/\\1"/' /etc/mysql/conf.d/wsrep.cnf
-    EOH
+    notifies :restart, "service[mysql]", :immediately
 end
 
 service "mysql" do

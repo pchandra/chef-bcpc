@@ -33,6 +33,16 @@ CLUSTER_VM_DRIVE_SIZE=20480
 VBOX_DIR="`dirname ${BASH_SOURCE[0]}`/vbox"
 P=`python -c "import os.path; print os.path.abspath(\"${VBOX_DIR}/\")"`
 
+
+# from EVW packer branch
+vbm_import() {
+    local -r image_name="$1"
+    local -r vm_name="$2"
+    shift 2
+    # this currently assumes that only one virtual system is imported
+    "$VBM" import "$image_name" --vsys 0 --vmname "$vm_name" "$@"
+}
+
 ######################################################
 # Function to download files necessary for VM stand-up
 # 
@@ -111,13 +121,13 @@ function remove_DHCPservers {
     # (e.g. ^vboxnet0$|^vboxnet1$)
     local existing_nets_reg_ex=$(sed -e 's/^/^/' -e '/$/$/' -e 's/ /$|^/g' <<< "$vm_networks")
 
-    $VBM list dhcpservers | grep -E "^NetworkName:\s+HostInterfaceNetworking" | sed 's/^.*-//' |
+    $VBM list dhcpservers | grep -E "^NetworkName:\s+HostInterfaceNetworking" | awk '{print $2}' |
     while read -r network_name; do
       [[ -n $existing_nets_reg_ex ]] && ! egrep -q $existing_nets_reg_ex <<< $network_name && continue
       remove_DHCPservers $network_name
     done
   else
-    $VBM dhcpserver remove --ifname "$network_name" && local return=0 || local return=$?
+    $VBM dhcpserver remove --netname "$network_name" && local return=0 || local return=$?
     return $return
   fi
 }
@@ -189,35 +199,46 @@ function create_bootstrap_VM {
     $VBM hostonlyif ipconfig "$VBN0" --ip 10.0.100.2    --netmask 255.255.255.0
     $VBM hostonlyif ipconfig "$VBN1" --ip 172.16.100.2  --netmask 255.255.255.0
     $VBM hostonlyif ipconfig "$VBN2" --ip 192.168.100.2 --netmask 255.255.255.0
-   
+
     # Create bootstrap VM
     for vm in bcpc-bootstrap; do
-      # Only if VM doesn't exist
-      if ! $VBM list vms | grep "^\"${vm}\"" ; then
-          $VBM createvm --name $vm --ostype Ubuntu_64 --basefolder $P --register
-          $VBM modifyvm $vm --memory $BOOTSTRAP_VM_MEM
-          $VBM modifyvm $vm --cpus $BOOTSTRAP_VM_CPUs
-          $VBM storagectl $vm --name "SATA Controller" --add sata
-          $VBM storagectl $vm --name "IDE Controller" --add ide
-          # Create a number of hard disks
-          port=0
-          for disk in a; do
-              $VBM createhd --filename $P/$vm/$vm-$disk.vdi --size ${BOOTSTRAP_VM_DRIVE_SIZE-20480}
-              $VBM storageattach $vm --storagectl "SATA Controller" --device 0 --port $port --type hdd --medium $P/$vm/$vm-$disk.vdi
-              port=$((port+1))
-          done
-          # Add the network interfaces
-          $VBM modifyvm $vm --nic1 nat
-          $VBM modifyvm $vm --nic2 hostonly --hostonlyadapter2 "$VBN0"
-          $VBM modifyvm $vm --nic3 hostonly --hostonlyadapter3 "$VBN1"
-          $VBM modifyvm $vm --nic4 hostonly --hostonlyadapter4 "$VBN2"
-          # Add the bootable mini ISO for installing Ubuntu 12.04
-          $VBM storageattach $vm --storagectl "IDE Controller" --device 0 --port 0 --type dvddrive --medium ubuntu-12.04-mini.iso
-          $VBM modifyvm $vm --boot1 disk
-      fi
+        # Only if VM doesn't exist
+        if ! $VBM list vms | grep "^\"${vm}\"" ; then
+
+            # define this if you have a pre-built OVA image
+            # (virtualbox exported machine image), for example as
+            # built by
+            # https://github.com/ericvw/chef-bcpc/tree/packer/bootstrap
+            #ARCHIVED_BOOTSTRAP=~/bcpc-cache/packer-bcpc-bootstrap_ubuntu-12.04-amd64.ova
+
+            if [[ -n "$ARCHIVED_BOOTSTRAP" && -f "$ARCHIVED_BOOTSTRAP" ]]; then
+                vbm_import "$ARCHIVED_BOOTSTRAP" bcpc-bootstrap
+            else
+                $VBM createvm --name $vm --ostype Ubuntu_64 --basefolder $P --register
+                $VBM modifyvm $vm --memory $BOOTSTRAP_VM_MEM
+                $VBM modifyvm $vm --cpus $BOOTSTRAP_VM_CPUs
+                $VBM storagectl $vm --name "SATA Controller" --add sata
+                $VBM storagectl $vm --name "IDE Controller" --add ide
+                # Create a number of hard disks
+                port=0
+                for disk in a; do
+                    $VBM createhd --filename $P/$vm/$vm-$disk.vdi --size ${BOOTSTRAP_VM_DRIVE_SIZE-20480}
+                    $VBM storageattach $vm --storagectl "SATA Controller" --device 0 --port $port --type hdd --medium $P/$vm/$vm-$disk.vdi
+                    port=$((port+1))
+                done
+                # Add the bootable mini ISO for installing Ubuntu 12.04
+                $VBM storageattach $vm --storagectl "IDE Controller" --device 0 --port 0 --type dvddrive --medium ubuntu-12.04-mini.iso
+                $VBM modifyvm $vm --boot1 disk
+            fi
+            # Add the network interfaces
+            $VBM modifyvm $vm --nic1 nat
+            $VBM modifyvm $vm --nic2 hostonly --hostonlyadapter2 "$VBN0"
+            $VBM modifyvm $vm --nic3 hostonly --hostonlyadapter3 "$VBN1"
+            $VBM modifyvm $vm --nic4 hostonly --hostonlyadapter4 "$VBN2"
+        fi
     done
-  fi
-  popd
+        fi
+        popd
 }
 
 ###################################################################

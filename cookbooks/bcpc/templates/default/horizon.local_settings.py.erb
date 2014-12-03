@@ -16,6 +16,12 @@ TEMPLATE_DEBUG = DEBUG
 
 SITE_BRANDING = "<%=node['bcpc']['region_name']%>"
 
+#
+# Set the timeout of the dashboard to match the keystone 
+# token timeout. 
+#
+SESSION_TIMEOUT=3600
+
 # Required for Django 1.5.
 # If horizon is running in production (DEBUG is False), set this
 # with the list of host/domain names that the application can serve.

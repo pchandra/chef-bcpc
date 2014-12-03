@@ -141,3 +141,22 @@ bash "keystone-create-test-tenants" do
     EOH
     only_if ". /root/keystonerc; . /root/adminrc; keystone user-get #{get_config('keystone-test-user')} 2>&1 | grep -e '^No user'"
 end
+
+ruby_block "generate-random-time" do
+    block do
+        make_config('keystone-token-clean-hour', rand(24))
+    end
+end
+
+template "/usr/local/bin/keystone_token_cleaner" do
+    source "keystone.token_cleaner.erb"
+    owner "root"
+    group "root"
+    mode 00755
+end
+
+cron "keystone-token-flush" do
+  action :create
+  command "/usr/local/bin/keystone_token_cleaner"
+  hour get_config('keystone-token-clean-hour')
+end

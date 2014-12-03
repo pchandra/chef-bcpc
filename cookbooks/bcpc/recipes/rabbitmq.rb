@@ -105,7 +105,7 @@ get_head_nodes.each do |server|
             code <<-EOH
                 rabbitmqctl stop_app
                 rabbitmqctl reset
-                rabbitmqctl join_cluster --ram rabbit@#{server['hostname']}
+                rabbitmqctl join_cluster rabbit@#{server['hostname']}
                 rabbitmqctl start_app
             EOH
             not_if "rabbitmqctl cluster_status | grep rabbit@#{server['hostname']}"

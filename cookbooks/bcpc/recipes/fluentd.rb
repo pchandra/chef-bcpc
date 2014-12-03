@@ -63,6 +63,11 @@ if node['bcpc']['enabled']['logging'] then
         code <<-EOH
             cd /usr/lib/fluent/ruby/lib/ruby/gems/*/gems/fluent-plugin-elasticsearch-*/lib/fluent/plugin
             patch < /tmp/fluentd.patch
+            rv=$?
+            if [ $rv -ne 0 ]; then
+              echo "Error applying patch ($rv) - aborting!"
+              exit $rv
+            fi
             cp /tmp/fluentd.patch .
         EOH
         not_if "test -f /usr/lib/fluent/ruby/lib/ruby/gems/*/gems/fluent-plugin-elasticsearch-*/lib/fluent/plugin/fluentd.patch"
