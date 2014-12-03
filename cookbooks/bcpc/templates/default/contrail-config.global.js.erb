@@ -215,6 +215,12 @@ config.cacheExpire.topo_tree_time = 600; /* Seconds */
 /* Logo File: Use complete path of logo file location */
 config.logo_file = '/var/lib/contrail-webui-bundle/webroot/img/opencontrail-logo.png';
 
+config.featurePkg = {};
+/* Add new feature Package Config details below */
+config.featurePkg.webController = {};
+config.featurePkg.webController.path = '/var/lib/contrail-webui/contrail-web-controller';
+config.featurePkg.webController.enable = true;
+
 /* Enable/disable Stat Query Links in Sidebar*/
 config.qe = {};
 config.qe.enable_stat_queries = false;
@@ -224,6 +230,39 @@ config.qe.enable_stat_queries = false;
  */
 config.logs = {};
 config.logs.level = 'debug';
+
+/******************************************************************************
+ * Boolean flag getDomainProjectsFromApiServer indicates wheather the project
+ * list should come from API Server or Identity Manager.
+ * If Set
+ *      - true, then project list will come from API Server
+ *      - false, then project list will come from Identity Manager
+ * Default: false
+ *
+******************************************************************************/
+config.getDomainProjectsFromApiServer = false;
+/*****************************************************************************
+* Boolean flag L2_enable indicates the default forwarding-mode of a network.
+* Allowed values : true / false
+* Set this flag to true if all the networks are to be L2 networks,
+* set to false otherwise.
+*****************************************************************************/
+config.network = {};
+config.network.L2_enable = false;
+
+/******************************************************************************
+ * Boolean flag getDomainsFromApiServer indicates wheather the domain
+ * list should come from API Server or Identity Manager.
+ * If Set
+ *      - true, then domain list will come from API Server
+ *      - false, then domain list will come from Identity Manager
+ * Default: true
+ * NOTE: if config.identityManager.apiVersion is set as v2.0, then this flag
+ *       does not have any effect, in that case the domain list is retrieved
+ *       from API Server.
+ *
+*****************************************************************************/
+config.getDomainsFromApiServer = false;
 
 // Export this as a module.
 module.exports = config;

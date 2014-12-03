@@ -73,36 +73,26 @@ template "/etc/contrail/vnc_api_lib.ini" do
     notifies :restart, "service[contrail-api]", :delayed
 end
 
-%w{ discovery
-    svc-monitor
-}.each do |pkg|
-    template "/etc/contrail/#{pkg}.conf" do
-        source "contrail-#{pkg}.conf.erb"
-        owner "contrail"
-        group "contrail"
-        mode 00640
-        variables(:servers => get_head_nodes)
-        notifies :restart, "service[contrail-#{pkg}]", :immediately
-    end
+template "/etc/contrail/svc-monitor.conf" do
+    source "contrail-svc-monitor.conf.erb"
+    owner "contrail"
+    group "contrail"
+    mode 00640
+    variables(:servers => get_head_nodes)
+    notifies :restart, "service[contrail-svc-monitor]", :delayed
 end
 
-template "/etc/contrail/dns/dns.conf" do
+template "/etc/contrail/dns.conf" do
     source "contrail-dns.conf.erb"
     owner "contrail"
     group "contrail"
     mode 00640
-    notifies :restart, "service[contrail-dns]", :immediately
+    notifies :restart, "service[contrail-dns]", :delayed
 end
 
-template "/etc/contrail/control-node.conf" do
-    source "contrail-control-node.conf.erb"
-    owner "contrail"
-    group "contrail"
-    mode 00640
-    notifies :restart, "service[contrail-control]", :immediately
-end
-
-%w{ contrail-api
+%w{ contrail-discovery
+    contrail-control
+    contrail-api
     contrail-schema
     contrail-analytics-api
     contrail-collector

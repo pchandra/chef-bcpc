@@ -5,22 +5,13 @@
 ################################################
 
 [DEFAULT]
-log_file = /var/log/contrail/contrail-collector.log
-# analytics_data_ttl=48
+analytics_data_ttl=48
 cassandra_server_list = <%= @servers.collect{|x| x['bcpc']['management']['ip']+':9160'}.join(' ') %>
-# dup=0
 hostip = <%=node['bcpc']['management']['ip']%>
-# hostname= # Retrieved as `hostname`
-# http_server_port=8089
-# log_category=
-# log_disable=0
-# log_file=<stdout>
-# log_files_count=10
-# log_file_size=1048576 # 1MB
-# log_level=SYS_NOTICE
-# log_local=0
-# syslog_port=0
-# test_mode=0
+http_server_port=8089
+log_local = 1
+log_level = SYS_NOTICE
+log_file = /var/log/contrail/contrail-collector.log
 
 [COLLECTOR]
 # port=8086

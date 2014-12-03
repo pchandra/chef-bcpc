@@ -48,7 +48,7 @@ bind_host = <%= node['bcpc']['management']['ip'] %>
 # api_extensions_path = extensions:/path/to/more/extensions:/even/more/extensions
 # The __path__ of neutron.extensions is appended to this, so if your
 # extensions are in there you don't need to specify them here
-api_extensions_path = extensions:/usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions
+api_extensions_path = /usr/lib/python2.7/dist-packages/neutron_plugin_contrail/extensions
 
 # (StrOpt) Neutron core plugin entrypoint to be loaded from the
 # neutron.core_plugins namespace. See setup.cfg for the entrypoint names of the
@@ -56,7 +56,7 @@ api_extensions_path = extensions:/usr/lib/python2.7/dist-packages/neutron_plugin
 # previous versions, the class name of a plugin can be specified instead of its
 # entrypoint name.
 #
-core_plugin = neutron_plugin_contrail.plugins.opencontrail.contrailplugin.ContrailPlugin
+core_plugin = neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2
 # Example: core_plugin = ml2
 
 # (ListOpt) List of service plugin entrypoints to be loaded from the
@@ -157,7 +157,7 @@ rabbit_password = <%=get_config('rabbitmq-password')%>
 # Use HA queues in RabbitMQ (x-ha-policy: all). You need to
 # wipe RabbitMQ database when changing this option. (boolean value)
 rabbit_ha_queues = False
-rabbit_durable_queues = True
+rabbit_durable_queues = False
 
 # QPID
 # rpc_backend=neutron.openstack.common.rpc.impl_qpid

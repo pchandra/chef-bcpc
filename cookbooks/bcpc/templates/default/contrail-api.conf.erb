@@ -5,8 +5,8 @@
 ################################################
 
 [DEFAULTS]
-log_file = /var/log/contrail/contrail-api.log
 listen_ip_addr = <%=node['bcpc']['management']['ip']%>
+listen_ip_port = 8082
 ifmap_server_ip = <%=node['bcpc']['management']['ip']%>
 ifmap_server_port = 8445
 ifmap_username = api-server
@@ -15,9 +15,15 @@ cassandra_server_list = <%= @servers.collect{|x| x['bcpc']['management']['ip']+'
 auth = keystone
 multi_tenancy = True
 disc_server_ip = <%=node['bcpc']['management']['vip']%>
+disc_server_oprt = 5998
 zk_server_ip = <%= @servers.collect{|x| x['bcpc']['management']['ip']+':2181'}.join(',') %>
+redis_server_ip = <%=node['bcpc']['management']['ip']%>
 rabbit_server = <%=node['bcpc']['management']['vip']%>
 rabbit_password = <%=get_config('rabbitmq-password')%>
+rabbit_port = 5672
+log_file = /var/log/contrail/contrail-api.log
+log_local = 1
+log_level = SYS_NOTICE
 
 [KEYSTONE]
 auth_host = <%=node['bcpc']['management']['vip']%>
