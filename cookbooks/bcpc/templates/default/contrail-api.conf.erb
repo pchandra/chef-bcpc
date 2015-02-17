@@ -15,7 +15,7 @@ cassandra_server_list = <%= @servers.collect{|x| x['bcpc']['management']['ip']+'
 auth = keystone
 multi_tenancy = True
 disc_server_ip = <%=node['bcpc']['management']['vip']%>
-disc_server_oprt = 5998
+disc_server_port = 5998
 zk_server_ip = <%= @servers.collect{|x| x['bcpc']['management']['ip']+':2181'}.join(',') %>
 redis_server_ip = <%=node['bcpc']['management']['ip']%>
 rabbit_server = <%=node['bcpc']['management']['vip']%>
