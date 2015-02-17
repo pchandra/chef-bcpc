@@ -44,6 +44,15 @@ end
     end
 end
 
+# Workaround for disabled SSLv3 in java (only needed for contrail 1.20, fixed upstream)
+bash "fix-java-ssl" do
+    user "root"
+    code <<-EOH
+        sed --in-place 's/^jdk.tls.disabledAlgorithms=SSLv3/#jdk.tls.disabledAlgorithms=SSLv3/' /etc/java-6-openjdk/security/java.security
+    EOH
+    only_if "egrep '^jdk.tls.disabledAlgorithms=SSLv3' /etc/java-6-openjdk/security/java.security"
+end
+
 # Needed to get around CA cert not being settable in all Contrail services
 bash "add-cert-to-certifi" do
     user "root"
