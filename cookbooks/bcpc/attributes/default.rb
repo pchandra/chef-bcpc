@@ -20,6 +20,8 @@ default['bcpc']['region_name'] = node.chef_environment
 default['bcpc']['domain_name'] = "bcpc.example.com"
 # Key if Cobalt+VMS is to be used
 default['bcpc']['vms_key'] = nil
+# Configurable ASN for Contrail
+default['bcpc']['contrail_asn'] = 64510
 
 ###########################################
 #

@@ -176,6 +176,36 @@ bash "provision-linklocal-metadata" do
     EOH
 end
 
+bash "provision-global-asn" do
+    user "root"
+    code <<-EOH
+        contrail-provision-control \
+            --conf_file /etc/contrail/contrail-schema.conf \
+            --router_asn #{node['bcpc']['contrail_asn']}
+    EOH
+end
+
+bash "provision-control-node" do
+    user "root"
+    code <<-EOH
+        contrail-provision-control \
+            --conf_file /etc/contrail/contrail-schema.conf \
+            --host_name #{node['hostname']} \
+            --host_ip #{node['bcpc']['management']['ip']} \
+            --oper add
+    EOH
+end
+
+bash "provision-encap" do
+    user "root"
+    code <<-EOH
+        contrail-provision-encap \
+            --conf_file /etc/contrail/contrail-schema.conf \
+            --encap_priority MPLSoUDP,MPLSoGRE,VXLAN \
+            --oper add
+    EOH
+end
+
 get_all_nodes.each do |server|
     bash "provision-vrouter" do
         user "root"
