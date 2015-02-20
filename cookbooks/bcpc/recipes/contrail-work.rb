@@ -58,6 +58,19 @@ bash "vhost0-up" do
     not_if "ip link show up | grep vhost0"
 end
 
+template "/etc/network/interfaces.d/iface-vgw" do
+    source "network.vgw.erb"
+    owner "root"
+    group "root"
+    mode 00644
+end
+
+bash "vgw-up" do
+    user "root"
+    code "ifup vgw"
+    not_if "ip link show up | grep vgw"
+end
+
 template "/etc/contrail/contrail-vrouter-agent.conf" do
     source "contrail-vrouter-agent.conf.erb"
     owner "contrail"
