@@ -44,6 +44,25 @@ end
     end
 end
 
+# Workaround hardcoded rndc key in contrail-dns 1.20
+bash "fix-hardcoded-rndc-key" do
+    user "root"
+    code <<-EOH
+        sed --in-place 's/secret123/xvysmOR8lnUQRBcunkC6vg==/' /etc/contrail/dns/rndc.conf
+    EOH
+end
+
+# Workaround missing init scripts for contrail-named
+template "/etc/init/contrail-named.conf" do
+    source "upstart-contrail-named.conf.erb"
+    owner "root"
+    group "root"
+    mode 00644
+end
+link "/etc/init.d/contrail-named" do
+    to "/lib/init/upstart-job"
+end
+
 # Workaround for disabled SSLv3 in java (only needed for contrail 1.20, fixed upstream)
 bash "fix-java-ssl" do
     user "root"
@@ -91,14 +110,6 @@ template "/etc/contrail/svc-monitor.conf" do
     notifies :restart, "service[contrail-svc-monitor]", :delayed
 end
 
-template "/etc/contrail/dns.conf" do
-    source "contrail-dns.conf.erb"
-    owner "contrail"
-    group "contrail"
-    mode 00640
-    notifies :restart, "service[contrail-dns]", :delayed
-end
-
 %w{ contrail-discovery
     contrail-control
     contrail-api
@@ -115,6 +126,15 @@ end
         variables(:servers => get_head_nodes)
         notifies :restart, "service[#{pkg}]", :immediately
     end
+end
+
+template "/etc/contrail/dns.conf" do
+    source "contrail-dns.conf.erb"
+    owner "contrail"
+    group "contrail"
+    mode 00640
+    notifies :restart, "service[contrail-dns]", :immediately
+    notifies :restart, "service[contrail-named]", :immediately
 end
 
 template "/var/lib/contrail-webui/contrail-web-core/keys/cs-cert.pem" do
@@ -155,6 +175,7 @@ end
     contrail-query-engine
     contrail-control
     contrail-dns
+    contrail-named
     contrail-webui-jobserver
     contrail-webui-webserver
 }.each do |svc|
