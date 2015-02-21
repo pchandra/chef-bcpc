@@ -12,19 +12,24 @@ if [ "$1" = "discovery" ]; then
     echo "################################"
     echo "# CONTRAIL DISCOVERY SERVICE"
     service contrail-discovery restart
+    sleep 10
 fi
 
 echo
 echo "################################"
 echo "# CONTRAIL HEAD NODE SERVICES"
-for i in contrail-analytics-api \
+for i in ifmap-server \
+         contrail-analytics-api \
          contrail-collector \
          contrail-query-engine \
          contrail-svc-monitor \
          contrail-api \
          contrail-control \
          contrail-dns \
-         contrail-schema
+         contrail-named \
+         contrail-schema \
+         contrail-webui-webserver \
+         contrail-webui-jobserver
 do
     service $i restart
 done
