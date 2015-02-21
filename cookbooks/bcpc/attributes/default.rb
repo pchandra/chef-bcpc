@@ -131,7 +131,6 @@ default['bcpc']['storage']['interface'] = nil
 # to be set properly
 default['bcpc']['storage']['interface-parent'] = nil
 
-default['bcpc']['floating']['vip'] = "192.168.43.15"
 default['bcpc']['floating']['netmask'] = "255.255.255.0"
 default['bcpc']['floating']['cidr'] = "192.168.43.0/24"
 default['bcpc']['floating']['gateway'] = "192.168.43.2"
@@ -209,8 +208,8 @@ default['bcpc']['zabbix']['group'] = "adm"
 
 default['bcpc']['ports']['apache']['radosgw'] = 80
 default['bcpc']['ports']['apache']['radosgw_https'] = 443
-default['bcpc']['ports']['haproxy']['radosgw'] = 80
-default['bcpc']['ports']['haproxy']['radosgw_https'] = 443
+default['bcpc']['ports']['haproxy']['radosgw'] = 10080
+default['bcpc']['ports']['haproxy']['radosgw_https'] = 10443
 
 # Can be set to 'http' or 'https'
 default['bcpc']['protocol']['keystone'] = "https"
