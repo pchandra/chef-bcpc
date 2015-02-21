@@ -106,7 +106,7 @@ template "/var/lib/nova/.ssh/known_hosts" do
     owner "nova"
     group "nova"
     mode 00644
-    variables(:servers => get_all_nodes)
+    variables(:servers => search_nodes("recipe", "nova-work"))
 end
 
 template "/var/lib/nova/.ssh/id_rsa" do
@@ -216,6 +216,25 @@ if node['bcpc']['virt_type'] == "kvm" then
             not_if "grep -e '^kvm_#{arch}' /etc/modules"
         end
     end
+end
+
+cookbook_file "/usr/local/bin/nova-service-restart" do
+  source "nova-service-restart"
+  owner "root"
+  mode "00755"
+end
+
+template "/usr/local/bin/nova-service-restart-wrapper" do
+    source "nova-service-restart-wrapper.erb"
+    owner "root"
+    group "root"
+    mode 00700
+end
+
+cron "restart-nova-kludge" do
+  action :create
+  command "/usr/local/bin/nova-service-restart-wrapper"
+  minute '*/5'   # run this every 5 mins
 end
 
 include_recipe "bcpc::cobalt"

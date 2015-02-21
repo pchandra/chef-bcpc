@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: bcpc
-# Recipe:: haproxy
+# Recipe:: haproxy-common
 #
 # Copyright 2013, Bloomberg Finance L.P.
 #
@@ -52,16 +52,6 @@ template "/etc/haproxy/haproxy.pem" do
     group "root"
     mode 00600
     notifies :restart, "service[haproxy]", :delayed
-end
-
-template "/etc/haproxy/haproxy.cfg" do
-    source "haproxy.cfg.erb"
-    mode 00644
-    variables(
-        :servers => get_head_nodes,
-        :all_servers => get_ceph_osd_nodes
-    )
-    notifies :restart, "service[haproxy]", :immediately
 end
 
 service "haproxy" do

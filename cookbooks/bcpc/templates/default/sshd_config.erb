@@ -9,6 +9,7 @@ Port 22
 # Use these options to restrict which interfaces/protocols sshd will bind to
 #ListenAddress ::
 ListenAddress <%= node['bcpc']['management']['ip'] %>
+ListenAddress <%= node['bcpc']['storage']['ip'] %>
 
 Protocol 2
 # HostKeys for protocol version 2

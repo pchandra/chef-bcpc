@@ -9,6 +9,9 @@
 			body{
 				font-family: Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif;
 			}
+			p.version {
+			        font-style: italic;
+			}
 			div.block{
 				overflow:hidden;
 			}
@@ -26,7 +29,8 @@
 		</style>
 
 		<h2><%=node['bcpc']['region_name']%> - <%=node['bcpc']['management']['vip']%></h2>
-
+		<p class="version">BCPC cookbook <%= @cookbook_version %> (<%=node['bcpc']['openstack_release']%>-<%=node['bcpc']['openstack_branch']%>)</p>
+		
 		<h3>Web Interfaces</h3>
 			<div class="block">
 				<label>Openstack</label>
@@ -70,7 +74,7 @@
 			</div>
 			<div class="block">
 				<label>Graphite</label>
-				<a href="https://<%=node['bcpc']['management']['vip']%>:8888">https://<%=node['bcpc']['management']['vip']%>:8888</a>
+				<a href="https://<%=node['bcpc']['management']['monitoring']['vip']%>:8888">https://<%=node['bcpc']['management']['monitoring']['vip']%>:8888</a>
 				<br/><label>-</label>
 				<a href="https://graphite.<%=node['bcpc']['domain_name']%>">https://graphite.<%=node['bcpc']['domain_name']%></a>
 			</div>

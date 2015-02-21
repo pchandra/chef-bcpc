@@ -17,7 +17,10 @@
         "interface" : "eth1",
         "netmask" : "255.255.255.0",
         "cidr" : "10.0.100.0/24",
-        "gateway" : "10.0.100.3"
+        "gateway" : "10.0.100.3",
+        "monitoring": {
+          "vip" : "10.0.100.6"
+        }
       },
       "storage": {
         "interface" : "eth2",

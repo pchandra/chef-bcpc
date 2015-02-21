@@ -71,7 +71,10 @@ rgw_crush_ruleset = (node['bcpc']['ceph']['rgw']['type'] == "ssd") ? node['bcpc'
     end
     bash "set-#{pool}-rados-pool-replicas" do
         user "root"
-        replicas = [get_all_nodes.length, node['bcpc']['ceph']['rgw']['replicas']].min
+        replicas = [search_nodes("recipe", "ceph-work").length, node['bcpc']['ceph']['rgw']['replicas']].min
+        if replicas < 1; then
+            replicas = 1
+        end
         code "ceph osd pool set #{pool} size #{replicas}"
         not_if "ceph osd pool get #{pool} size | grep #{replicas}"
     end
@@ -113,7 +116,6 @@ end
 service "radosgw-all" do
   provider Chef::Provider::Service::Upstart
   action [ :enable, :start ]
-  subscribes :restart, "template[/etc/ceph/ceph.conf]", :delayed
 end 
 
 ruby_block "initialize-radosgw-admin-user" do

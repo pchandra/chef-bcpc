@@ -37,12 +37,9 @@ net.ipv4.udp_wmem_min = 8192
 # Set keepalive timeout for TCP
 net.ipv4.tcp_keepalive_time=1800
 
-# Log packets with impossible addresses for security
-net.ipv4.conf.all.log_martians = 1 
-
 # Enable binding to non-local IP addresses
 net.ipv4.ip_nonlocal_bind=1
 
 # Avoid swapping
 vm.swappiness = 0
-
+vm.min_free_kbytes = 135168

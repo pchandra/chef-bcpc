@@ -12,6 +12,8 @@ default['bcpc']['openstack_release'] = "icehouse"
 default['bcpc']['openstack_branch'] = "proposed"
 # Should be kvm (or qemu if testing in VMs that don't support VT-x)
 default['bcpc']['virt_type'] = "kvm"
+# Define the kernel to be installed. By default, track latest LTS kernel
+default['bcpc']['preseed']['kernel'] = "linux-image-generic-lts-trusty"
 # ulimits for libvirt-bin
 default['bcpc']['libvirt-bin']['ulimit']['nofile'] = 4096
 # Region name for this cluster
@@ -46,6 +48,8 @@ default['bcpc']['enabled']['keepalived_checks'] = true
 default['bcpc']['enabled']['network_tests'] = true
 # This will enable httpd disk caching for radosgw
 default['bcpc']['enabled']['radosgw_cache'] = false
+# This will enable using TPM-based hwrngd
+default['bcpc']['enabled']['tpm'] = false
 
 # This can be either 'sql' or 'ldap' to either store identities
 # in the mysql DB or the LDAP server
@@ -98,6 +102,12 @@ default['bcpc']['ceph']['vms_mem']['name'] = "vmsmem"
 default['bcpc']['ceph']['ssd']['ruleset'] = 1
 default['bcpc']['ceph']['hdd']['ruleset'] = 2
 
+# If you are about to make a big change to the ceph cluster
+# setting to true will reduce the load form the resulting
+# ceph rebalance and keep things operational. 
+# See wiki for further details. 
+default['bcpc']['ceph']['rebalance'] = false
+
 ###########################################
 #
 #  Network settings for the cluster
@@ -107,15 +117,28 @@ default['bcpc']['management']['vip'] = "10.17.1.15"
 default['bcpc']['management']['netmask'] = "255.255.255.0"
 default['bcpc']['management']['cidr'] = "10.17.1.0/24"
 default['bcpc']['management']['gateway'] = "10.17.1.1"
+default['bcpc']['management']['interface'] = nil
+default['bcpc']['management']['monitoring']['vip'] = "10.17.1.16"
+# if 'interface' is a VLAN interface, specifying a parent allows MTUs
+# to be set properly
+default['bcpc']['management']['interface-parent'] = nil
 
 default['bcpc']['storage']['netmask'] = "255.255.255.0"
 default['bcpc']['storage']['cidr'] = "100.100.0.0/24"
 default['bcpc']['storage']['gateway'] = "100.100.0.1"
+default['bcpc']['storage']['interface'] = nil
+# if 'interface' is a VLAN interface, specifying a parent allows MTUs
+# to be set properly
+default['bcpc']['storage']['interface-parent'] = nil
 
 default['bcpc']['floating']['vip'] = "192.168.43.15"
 default['bcpc']['floating']['netmask'] = "255.255.255.0"
 default['bcpc']['floating']['cidr'] = "192.168.43.0/24"
 default['bcpc']['floating']['gateway'] = "192.168.43.2"
+default['bcpc']['floating']['interface'] = nil
+# if 'interface' is a VLAN interface, specifying a parent allows MTUs
+# to be set properly
+default['bcpc']['floating']['interface-parent'] = nil
 
 default['bcpc']['ntp_servers'] = ["pool.ntp.org"]
 default['bcpc']['dns_servers'] = ["8.8.8.8", "8.8.4.4"]
@@ -197,6 +220,10 @@ default['bcpc']['protocol']['cinder'] = "https"
 default['bcpc']['protocol']['neutron'] = "https"
 default['bcpc']['protocol']['heat'] = "https"
 
+# Hour for the cron job to run keystone_token_cleaner script which
+# runs `keystone-manage token_flush` to clean out stale tokens
+default['bcpc']['keystone_token_clean_hour'] = "2"
+
 ###########################################
 #
 #  Nova Settings
@@ -209,3 +236,16 @@ default['bcpc']['protocol']['heat'] = "https"
 default['bcpc']['nova']['ram_allocation_ratio'] = 1.0
 default['bcpc']['nova']['reserved_host_memory_mb'] = 1024
 default['bcpc']['nova']['cpu_allocation_ratio'] = 2.0
+###########################################
+#
+# Routemon settings
+#
+###########################################
+#
+
+# numfixes is how many times to try and fix default routes in the mgmt
+# and storage networks when they disappear. If numfixes starts off at
+# 0, or after 'numfixes' attempts have been made, then routemon
+# subsequently only monitors and reports
+#
+default['bcpc']['routemon']['numfixes'] = 0

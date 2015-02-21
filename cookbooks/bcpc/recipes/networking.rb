@@ -103,6 +103,21 @@ end
 
 end
 
+%w{ storage floating }.each do |net|
+  if not node['bcpc'][net]['interface-parent'].nil? 
+    template "/etc/network/interfaces.d/iface-#{node['bcpc'][net]['interface-parent']}" do
+      source "network.iface-parent.erb"
+      owner "root"
+      group "root"
+      mode 00644
+      variables(
+                :interface => node['bcpc'][net]['interface-parent'],
+                :mtu => node['bcpc'][net]['mtu'],
+                )
+    end
+  end    
+end
+
 # set up the DNS resolvers
 # we want the VIP which will be running powerdns to be first on the list
 # but the first entry in our master list is also the only one in pdns,
@@ -146,6 +161,23 @@ bash "interface-mgmt-make-static-if-dhcp" do
 end
 
 %w{ management storage floating }.each do |iface|
+  
+  if not node['bcpc'][iface]['interface-parent'].nil? 
+    bash "#{iface} up" do
+      user "root"
+      code <<-EOH
+            ifup #{node['bcpc'][iface]['interface-parent']}
+        EOH
+      not_if "ip link show up | grep #{node['bcpc'][iface]['interface-parent']} | grep -v #{node['bcpc'][iface]['interface']}"
+    end
+    if node['bcpc'][iface]['mtu']
+        execute "set-#{iface}-mtu" do
+            command "ifconfig #{node['bcpc'][iface]['interface-parent']} mtu #{node['bcpc'][iface]['mtu']} up"
+            not_if  "ifconfig #{node['bcpc'][iface]['interface-parent']} | grep MTU:#{node['bcpc'][iface]['mtu']}"
+        end
+    end
+  end
+    
     bash "#{iface} up" do
         user "root"
         code <<-EOH
@@ -157,7 +189,7 @@ end
     if node['bcpc'][iface]['mtu']
         execute "set-#{iface}-mtu" do
             command "ifconfig #{node['bcpc'][iface]['interface']} mtu #{node['bcpc'][iface]['mtu']} up"
-            not_if "ifconfig #{node['bcpc'][iface]['interface']} | grep MTU:#{node['bcpc'][iface]['mtu']}"
+            not_if  "ifconfig #{node['bcpc'][iface]['interface']} | grep MTU:#{node['bcpc'][iface]['mtu']}"
         end
     end
 

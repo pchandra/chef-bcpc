@@ -166,7 +166,11 @@ if get_head_nodes.length == 1; then
     end
 end
 
-replicas = [get_all_nodes.length, node['bcpc']['ceph']['default']['replicas']].min
+replicas = [search_nodes("recipe", "ceph-work").length, node['bcpc']['ceph']['default']['replicas']].min
+if replicas < 1; then
+    replicas = 1
+end
+
 %w{data metadata rbd}.each do |pool|
     bash "set-#{pool}-rados-pool-replicas" do
         user "root"
@@ -185,5 +189,20 @@ end
         end
     end
 end
+
+%w{noscrub nodeep-scrub}.each do |flag|
+  if node['bcpc']['ceph']['rebalance'] 
+    execute "ceph-osd-set-#{flag}" do
+      command "ceph osd set #{flag}"
+      only_if "ceph health"    
+    end
+  else
+    execute "ceph-osd-unset-#{flag}" do
+      command "ceph osd unset #{flag}"
+      only_if "ceph health"
+    end
+  end
+end
+    
 
 include_recipe "bcpc::ceph-work"

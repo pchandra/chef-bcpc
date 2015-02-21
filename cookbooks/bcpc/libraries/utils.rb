@@ -65,11 +65,26 @@ end
 def get_config(key)
     init_config if $dbi.nil?
     puts "------------ Fetching value for key \"#{key}\""
-    return (node['bcpc']['enabled']['encrypt_data_bag']) ? $edbi[key] : $dbi[key]
+    result = (node['bcpc']['enabled']['encrypt_data_bag']) ? $edbi[key] : $dbi[key]
+    raise "No config found for get_config(#{key})!!!" if result.nil?
+    return result
+end
+
+def search_nodes(key, value)
+    if key == "recipe"
+        results = search(:node, "recipes:bcpc\\:\\:#{value} AND chef_environment:#{node.chef_environment}")
+    elsif key == "role"
+        results = search(:node, "roles:#{value} AND chef_environment:#{node.chef_environment}")
+    else
+        raise("Invalid search key: #{key}")
+    end
+
+    results.map! { |x| x['hostname'] == node['hostname'] ? node : x }
+    return results.sort! { |a, b| a['hostname'] <=> b['hostname'] }
 end
 
 def get_all_nodes
-    results = search(:node, "(role:BCPC-Headnode OR role:BCPC-Worknode) AND chef_environment:#{node.chef_environment}")
+    results = search(:node, "recipes:bcpc\\:\\:default AND chef_environment:#{node.chef_environment}")
     if results.any? { |x| x['hostname'] == node['hostname'] }
         results.map! { |x| x['hostname'] == node['hostname'] ? node : x }
     else
@@ -207,4 +222,14 @@ def ping_node_list(list_name, ping_list, fast_exit=true)
     if not success
         raise ("Network test failed: #{list_name} unreachable")
     end
+end
+
+def generate_vrrp_vrid()
+    init_config if $dbi.nil?
+    dbi = Chef::DataBagItem.load('configs', node.chef_environment)
+    a =  dbi.select {|key| /^keepalived-.*router-id$/.match(key)}.values
+    exclusions = a.collect {|a| [a-1, a, a+1]}.flatten
+    results = (1..254).to_a - exclusions
+    raise "Unable to generate unique VRID" if results.empty?
+    results.first
 end

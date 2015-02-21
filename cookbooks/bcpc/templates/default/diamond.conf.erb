@@ -60,7 +60,7 @@ days = 7
 ### Options for GraphiteHandler
 
 # Graphite server host
-host = <%=node['bcpc']['management']['vip']%>
+host = <%=node['bcpc']['management']['monitoring']['vip']%>
 
 # Port to send metrics to
 port = 2013
@@ -75,7 +75,7 @@ batch = 512
 ### Options for GraphitePickleHandler
 
 # Graphite server host
-host = <%=node['bcpc']['management']['vip']%>
+host = <%=node['bcpc']['management']['monitoring']['vip']%>
 
 # Port to send metrics to
 port = 2014

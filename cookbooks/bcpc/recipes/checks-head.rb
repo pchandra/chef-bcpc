@@ -1,6 +1,6 @@
 include_recipe "bcpc::checks-common"
 
- %w{ nova rgw mysql }.each do |cc|
+ %w{ rgw mysql }.each do |cc|
    template  "/usr/local/etc/checks/#{cc}.yml" do
      source "checks/#{cc}.yml.erb"
      owner "root"

@@ -43,32 +43,35 @@ template "/tmp/389ds-install.inf" do
     mode 00600
 end
 
-bash "setup-389ds-server" do
-    user "root"
-    code <<-EOH
-        setup-ds-admin --file=/tmp/389ds-install.inf -k -s
-        service dirsrv stop
-        service dirsrv-admin stop
-        sed --in-place 's/^ServerLimit.*/ServerLimit 64/' /etc/dirsrv/admin-serv/httpd.conf
-        sed --in-place '/^MinSpareThreads/d' /etc/dirsrv/admin-serv/httpd.conf
-        sed --in-place '/^MaxSpareThreads/d' /etc/dirsrv/admin-serv/httpd.conf
-        sed --in-place '/^ThreadsPerChild/d' /etc/dirsrv/admin-serv/httpd.conf
-        sed --in-place 's/^nsslapd-port.*/nsslapd-listenhost: #{node['bcpc']['management']['ip']}\\nnsslapd-port: 389/' /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
-        echo "dn: cn=Replication Manager,cn=config" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
-        echo "objectClass: inetorgperson" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
-        echo "objectClass: person" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
-        echo "objectClass: top" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
-        echo "cn: Replication Manager" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
-        echo "sn: RM" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
-        echo "userPassword: #{get_config('389ds-replication-password')}" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
-        echo "passwordExpirationTime: 20380119031407Z" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
-        echo "nsIdleTimeout: 0" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
-        service dirsrv start
-        service dirsrv-admin start
-    EOH
-    not_if "test -d /etc/dirsrv/slapd-#{node['hostname']}"
-    notifies :create, "ruby_block[ldap-requires-initialization]", :immediately
-    notifies :create, "ruby_block[disable-anonymous-bind]", :immediately
+ruby_block "setup-389ds-server" do
+    block do
+        system "test -d /etc/dirsrv/slapd-#{node['hostname']}"
+        if not $?.success? then
+            %x[ setup-ds-admin --file=/tmp/389ds-install.inf -k -s
+                service dirsrv stop
+                service dirsrv-admin stop
+                sed --in-place 's/^ServerLimit.*/ServerLimit 64/' /etc/dirsrv/admin-serv/httpd.conf
+                sed --in-place '/^MinSpareThreads/d' /etc/dirsrv/admin-serv/httpd.conf
+                sed --in-place '/^MaxSpareThreads/d' /etc/dirsrv/admin-serv/httpd.conf
+                sed --in-place '/^ThreadsPerChild/d' /etc/dirsrv/admin-serv/httpd.conf
+                sed --in-place 's/^nsslapd-port.*/nsslapd-listenhost: #{node['bcpc']['management']['ip']}\\nnsslapd-port: 389/' /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
+                echo "dn: cn=Replication Manager,cn=config" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
+                echo "objectClass: inetorgperson" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
+                echo "objectClass: person" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
+                echo "objectClass: top" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
+                echo "cn: Replication Manager" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
+                echo "sn: RM" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
+                echo "userPassword: #{get_config('389ds-replication-password')}" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
+                echo "passwordExpirationTime: 20380119031407Z" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
+                echo "nsIdleTimeout: 0" >> /etc/dirsrv/slapd-#{node['hostname']}/dse.ldif
+                service dirsrv start
+                service dirsrv-admin start
+            ]
+            self.notifies :create, "ruby_block[ldap-requires-initialization]", :immediately
+            self.notifies :create, "ruby_block[disable-anonymous-bind]", :immediately
+            self.resolve_notification_references
+        end
+    end
 end
 
 ruby_block "ldap-requires-initialization" do

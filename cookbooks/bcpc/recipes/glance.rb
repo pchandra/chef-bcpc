@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-include_recipe "bcpc::mysql"
+include_recipe "bcpc::mysql-head"
 include_recipe "bcpc::ceph-head"
 include_recipe "bcpc::openstack"
 
@@ -111,9 +111,13 @@ bash "create-glance-rados-pool" do
     notifies :run, "bash[wait-for-pgs-creating]", :immediately
 end
 
+
 bash "set-glance-rados-pool-replicas" do
     user "root"
-    replicas = [get_all_nodes.length, node['bcpc']['ceph']['images']['replicas']].min
+    replicas = [search_nodes("recipe", "ceph-work").length, node['bcpc']['ceph']['images']['replicas']].min
+    if replicas < 1; then
+        replicas = 1
+    end
     code "ceph osd pool set #{node['bcpc']['ceph']['images']['name']} size #{replicas}"
     not_if "ceph osd pool get #{node['bcpc']['ceph']['images']['name']} size | grep #{replicas}"
 end

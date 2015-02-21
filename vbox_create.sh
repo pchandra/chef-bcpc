@@ -31,8 +31,7 @@ CLUSTER_VM_CPUs=2
 CLUSTER_VM_DRIVE_SIZE=20480
 
 VBOX_DIR="`dirname ${BASH_SOURCE[0]}`/vbox"
-P=`python -c "import os.path; print os.path.abspath(\"${VBOX_DIR}/\")"`
-
+P="$(cd $VBOX_DIR ; /bin/pwd)" || exit
 
 # from EVW packer branch
 vbm_import() {
