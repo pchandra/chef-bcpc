@@ -247,7 +247,7 @@ bash "create-public-network" do
     code <<-EOH
         . /root/adminrc
         neutron net-create --shared --router:external #{node['bcpc']['region_name']}
-        neutron subnet-create --name #{node['bcpc']['region_name']}-subnet1 #{node['bcpc']['region_name']} #{node['bcpc']['floating']['available_subnet']} --disable-dhcp
+        neutron subnet-create --name #{node['bcpc']['region_name']}-subnet1 #{node['bcpc']['region_name']} #{node['bcpc']['floating']['available_subnet']}
     EOH
     not_if ". /root/adminrc; neutron net-list | grep #{node['bcpc']['region_name']}"
 end
