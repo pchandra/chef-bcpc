@@ -48,7 +48,8 @@ template "/etc/network/interfaces.d/iface-vhost0" do
     variables(
         :interface => node['bcpc']['floating']['interface'],
         :ip => node['bcpc']['floating']['ip'],
-        :netmask => node['bcpc']['floating']['netmask']
+        :netmask => node['bcpc']['floating']['netmask'],
+        :gateway => node['bcpc']['floating']['gateway']
     )
 end
 
@@ -69,6 +70,17 @@ bash "vgw-up" do
     user "root"
     code "ifup vgw"
     not_if "ip link show up | grep vgw"
+end
+
+bash "route-and-nat-for-vgw" do
+    user "root"
+    code <<-EOH
+        route add -net #{node['bcpc']['floating']['available_subnet']} dev vgw
+        iptables -t nat -A POSTROUTING -o vhost0 -j MASQUERADE
+        iptables -A FORWARD -i vhost0 -o vgw -m state --state RELATED,ESTABLISHED -j ACCEPT
+        iptables -A FORWARD -i vgw -o vhost0 -j ACCEPT
+    EOH
+    not_if "ip route show | grep #{node['bcpc']['floating']['available_subnet']}"
 end
 
 template "/etc/contrail/contrail-vrouter-agent.conf" do

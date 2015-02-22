@@ -11,6 +11,7 @@ iface vhost0 inet static
  pre-up vif --add vhost0 --mac $(cat /sys/class/net/<%=@interface%>/address) --vrf 0 --type vhost --xconnect <%=@interface%>
  address <%= @ip %>
  netmask <%= @netmask %>
+ gateway <%= @gateway %>
  post-down vif --list | awk '/^vif.*OS: vhost0/ {split($1, arr, "\/"); print arr[2];}' | xargs vif --delete
  post-down vif --list | awk '/^vif.*OS: <%=@interface%>/ {split($1, arr, "\/"); print arr[2];}' | xargs vif --delete
  post-down ip link delete vhost0
