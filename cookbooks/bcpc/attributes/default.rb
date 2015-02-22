@@ -134,6 +134,7 @@ default['bcpc']['storage']['interface-parent'] = nil
 default['bcpc']['floating']['netmask'] = "255.255.255.0"
 default['bcpc']['floating']['cidr'] = "192.168.43.0/24"
 default['bcpc']['floating']['gateway'] = "192.168.43.2"
+default['bcpc']['floating']['available_subnet'] = "192.168.43.128/25"
 default['bcpc']['floating']['interface'] = nil
 # if 'interface' is a VLAN interface, specifying a parent allows MTUs
 # to be set properly

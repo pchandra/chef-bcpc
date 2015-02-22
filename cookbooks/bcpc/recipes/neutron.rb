@@ -28,6 +28,7 @@ end
 
 service "neutron-server" do
     action [:enable, :start]
+    restart_command "service neutron-server restart; sleep 5"
 end
 
 bash "config-contrail-ini" do

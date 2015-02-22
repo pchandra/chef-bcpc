@@ -124,15 +124,15 @@ physical_interface=<%=node['bcpc']['floating']['interface']%>
 # following format
 [GATEWAY-0]
 # Name of the routing_instance for which the gateway is being configured
-# routing_instance=default-domain:admin:public:public
+routing_instance=default-domain:<%=node['bcpc']['admin_tenant']%>:<%=node['bcpc']['region_name']%>:<%=node['bcpc']['region_name']%>
 
 # Gateway interface name
-# interface=vgw
+interface=vgw
 
 # Virtual network ip blocks for which gateway service is required. Each IP
 # block is represented as ip/prefix. Multiple IP blocks are represented by
 # separating each with a space
-# ip_blocks=1.1.1.1/24
+ip_blocks=<%=node['bcpc']['floating']['available_subnet']%>
 
 [GATEWAY-1]
 # Name of the routing_instance for which the gateway is being configured

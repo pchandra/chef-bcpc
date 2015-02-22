@@ -239,4 +239,18 @@ get_all_nodes.each do |server|
     end
 end
 
+# Neutron needs to be setup before we can setup the Floating IPs
+include_recipe "bcpc::neutron"
+
+bash "create-public-network" do
+    user "root"
+    code <<-EOH
+        . /root/adminrc
+        neutron net-create --shared --router:external #{node['bcpc']['region_name']}
+        neutron subnet-create --name #{node['bcpc']['region_name']}-subnet1 #{node['bcpc']['region_name']} #{node['bcpc']['floating']['available_subnet']} --disable-dhcp
+    EOH
+    not_if ". /root/adminrc; neutron net-list | grep #{node['bcpc']['region_name']}"
+end
+
+
 include_recipe "bcpc::contrail-work"
