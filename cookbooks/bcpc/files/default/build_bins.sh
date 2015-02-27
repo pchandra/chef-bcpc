@@ -261,5 +261,10 @@ if [ ! -f python-requests-aws_0.1.5_all.deb ]; then
 fi
 FILES="python-requests-aws_0.1.5_all.deb $FILES"
 
+# Get the 3.1.3 version of supervisor
+if [ ! -f supervisor_3.1.3_all.deb ]; then
+    fpm -s python -t deb -n supervisor -v 3.1.3 --python-install-bin /usr/bin --python-install-lib /usr/local/lib/python2.7/dist-packages supervisor
+fi
+FILES="supervisor_3.1.3_all.deb $FILES"
 
 popd
