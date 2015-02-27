@@ -26,6 +26,14 @@ apt_repository "contrail" do
     key "contrail.key"
 end
 
+apt_repository "contrail-2.0" do
+    uri node['bcpc']['repos']['contrail-2.0']
+    distribution node['lsb']['codename']
+    components ["main"]
+    arch "amd64"
+    key "contrail.key"
+end
+
 template "/usr/local/bin/hup_contrail" do
     source "hup_contrail.erb"
     mode 0755
