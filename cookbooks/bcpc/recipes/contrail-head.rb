@@ -44,6 +44,22 @@ end
     end
 end
 
+# Install updated supervisor package
+cookbook_file "/tmp/supervisor_3.1.3_all.deb" do
+    source "bins/supervisor_3.1.3_all.deb"
+    owner "root"
+    mode 00444
+end
+
+package "supervisor_3.1.3_all.deb" do
+    provider Chef::Provider::Package::Dpkg
+    source "/tmp/supervisor_3.1.3_all.deb"
+    action :install
+    notifies :restart, "service[supervisor-config]", :immediately
+    notifies :restart, "service[supervisor-control]", :immediately
+    notifies :restart, "service[supervisor-analytics]", :immediately
+end
+
 # Workaround hardcoded rndc key in contrail-dns 1.20
 bash "fix-hardcoded-rndc-key" do
     user "root"
@@ -170,6 +186,9 @@ end
     contrail-named
     contrail-webui-jobserver
     contrail-webui-webserver
+    supervisor-config
+    supervisor-control
+    supervisor-analytics
 }.each do |svc|
     service svc do
         action [:enable, :start]
