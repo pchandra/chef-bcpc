@@ -101,19 +101,11 @@ template "/etc/contrail/vnc_api_lib.ini" do
     notifies :restart, "service[contrail-api]", :delayed
 end
 
-template "/etc/contrail/svc-monitor.conf" do
-    source "contrail-svc-monitor.conf.erb"
-    owner "contrail"
-    group "contrail"
-    mode 00640
-    variables(:servers => get_head_nodes)
-    notifies :restart, "service[contrail-svc-monitor]", :delayed
-end
-
 %w{ contrail-discovery
     contrail-control
     contrail-api
     contrail-schema
+    contrail-svc-monitor
     contrail-analytics-api
     contrail-collector
     contrail-query-engine
