@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 
-include_recipe "bcpc::default"
+include_recipe "bcpc::openstack"
 
 apt_repository "contrail" do
     uri node['bcpc']['repos']['contrail']
