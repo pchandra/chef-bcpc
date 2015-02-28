@@ -33,11 +33,15 @@ end
 bash "enable-vrouter" do
     user "root"
     code <<-EOH
-        modprobe vrouter
         sed --in-place '/^vrouter$/d' /etc/modules
         echo 'vrouter' >> /etc/modules
     EOH
     not_if "grep -e '^vrouter$' /etc/modules"
+end
+
+bash "modprobe-vrouter" do
+    user "root"
+    code "modprobe vrouter"
 end
 
 template "/etc/network/interfaces.d/iface-vhost0" do

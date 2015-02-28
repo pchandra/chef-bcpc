@@ -44,6 +44,15 @@ end
     end
 end
 
+# Fix contrail supervisor config files
+%w{ contrail-api contrail-discovery }.each do |file|
+    bash "fix-supervisor-config-#{file}" do
+        user "root"
+        code "sed --in-place '/^process_name.*/d' /etc/contrail/supervisord_config_files/#{file}.ini"
+        only_if "grep process_name /etc/contrail/supervisord_config_files/#{file}.ini"
+    end
+end
+
 # Install updated supervisor package
 cookbook_file "/tmp/supervisor_3.1.3_all.deb" do
     source "bins/supervisor_3.1.3_all.deb"
@@ -58,25 +67,6 @@ package "supervisor_3.1.3_all.deb" do
     notifies :restart, "service[supervisor-config]", :immediately
     notifies :restart, "service[supervisor-control]", :immediately
     notifies :restart, "service[supervisor-analytics]", :immediately
-end
-
-# Workaround hardcoded rndc key in contrail-dns 1.20
-bash "fix-hardcoded-rndc-key" do
-    user "root"
-    code <<-EOH
-        sed --in-place 's/secret123/xvysmOR8lnUQRBcunkC6vg==/' /etc/contrail/dns/rndc.conf
-    EOH
-end
-
-# Workaround missing init scripts for contrail-named
-template "/etc/init/contrail-named.conf" do
-    source "upstart-contrail-named.conf.erb"
-    owner "root"
-    group "root"
-    mode 00644
-end
-link "/etc/init.d/contrail-named" do
-    to "/lib/init/upstart-job"
 end
 
 # Workaround for disabled SSLv3 in java (only needed for contrail 1.20, fixed upstream)
@@ -213,6 +203,8 @@ bash "provision-global-asn" do
     code <<-EOH
         contrail-provision-control \
             --conf_file /etc/contrail/contrail-schema.conf \
+            --api_server_ip #{node['bcpc']['management']['vip']} \
+            --api_server_port 8082 \
             --router_asn #{node['bcpc']['contrail_asn']}
     EOH
 end
@@ -222,20 +214,25 @@ bash "provision-control-node" do
     code <<-EOH
         contrail-provision-control \
             --conf_file /etc/contrail/contrail-schema.conf \
+            --api_server_ip #{node['bcpc']['management']['vip']} \
+            --api_server_port 8082 \
             --host_name #{node['hostname']} \
             --host_ip #{node['bcpc']['management']['ip']} \
+            --router_asn #{node['bcpc']['contrail_asn']} \
             --oper add
     EOH
 end
 
-bash "provision-encap" do
-    user "root"
-    code <<-EOH
-        contrail-provision-encap \
+ruby_block "provision-encap" do
+    block do
+        %x[ contrail-provision-encap \
             --conf_file /etc/contrail/contrail-schema.conf \
             --encap_priority MPLSoUDP,MPLSoGRE,VXLAN \
+            --admin_user #{get_config('keystone-admin-user')} \
+            --admin_password #{get_config('keystone-admin-password')} \
             --oper add
-    EOH
+        ]
+    end
 end
 
 get_all_nodes.each do |server|
@@ -244,6 +241,8 @@ get_all_nodes.each do |server|
         code <<-EOH
             contrail-provision-vrouter \
                 --conf_file /etc/contrail/contrail-schema.conf \
+                --api_server_ip #{node['bcpc']['management']['vip']} \
+                --api_server_port 8082 \
                 --host_name #{server['hostname']} \
                 --host_ip #{server['bcpc']['floating']['ip']}
         EOH

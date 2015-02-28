@@ -154,7 +154,7 @@ listen opencontrail-api <%=node['bcpc']['management']['vip']%>:8082
   option httpchk GET /
   http-check expect status 401
 <% @servers.each do |server| -%>
-  <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:8082 check inter 5s rise 1 fall 1" %>
+  <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:9100 check inter 5s rise 1 fall 1" %>
 <% end -%>
 
 listen opencontrail-analytics-api <%=node['bcpc']['management']['vip']%>:8081
@@ -172,7 +172,7 @@ listen opencontrail-discovery <%=node['bcpc']['management']['vip']%>:5998
   option httpchk GET /
   http-check expect status 200
 <% @servers.each do |server| -%>
-  <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:5998 check inter 5s rise 1 fall 1" %>
+  <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:9110 check inter 5s rise 1 fall 1" %>
 <% end -%>
 
 listen nova-ec2
