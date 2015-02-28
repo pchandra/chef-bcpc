@@ -50,6 +50,8 @@ default['bcpc']['enabled']['network_tests'] = true
 default['bcpc']['enabled']['radosgw_cache'] = false
 # This will enable using TPM-based hwrngd
 default['bcpc']['enabled']['tpm'] = false
+# This will enable an iptables NAT for Contrail (development ONLY)
+default['bcpc']['enabled']['contrail_dev_nat'] = true
 
 # This can be either 'sql' or 'ldap' to either store identities
 # in the mysql DB or the LDAP server

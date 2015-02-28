@@ -252,5 +252,32 @@ bash "create-public-network" do
     not_if ". /root/adminrc; neutron net-list | grep #{node['bcpc']['region_name']}"
 end
 
-
 include_recipe "bcpc::contrail-work"
+
+if node['bcpc']['enabled']['contrail_dev_nat'] then
+
+    template "/etc/network/interfaces.d/iface-vgw" do
+        source "network.vgw.erb"
+        owner "root"
+        group "root"
+        mode 00644
+    end
+
+    bash "vgw-up" do
+        user "root"
+        code "ifup vgw"
+        not_if "ip link show up | grep vgw"
+    end
+
+    bash "route-and-nat-for-vgw" do
+        user "root"
+        code <<-EOH
+            route add -net #{node['bcpc']['floating']['available_subnet']} dev vgw
+            iptables -t nat -A POSTROUTING -o vhost0 -j MASQUERADE
+            iptables -A FORWARD -i vhost0 -o vgw -m state --state RELATED,ESTABLISHED -j ACCEPT
+            iptables -A FORWARD -i vgw -o vhost0 -j ACCEPT
+        EOH
+        not_if "ip route show | grep #{node['bcpc']['floating']['available_subnet']}"
+    end
+
+end
