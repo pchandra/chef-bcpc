@@ -11,6 +11,14 @@
 var config = {};
 
 config.orchestration = {};
+/****************************************************************************
+ * Specify Orchestration Model
+ * Available models are:
+ *  - openstack
+ *  - cloudstack
+ * If you do not want to specify any model, set it to 'none'
+ *
+ *****************************************************************************/
 config.orchestration.Manager = 'openstack'
 
 /****************************************************************************
@@ -26,7 +34,7 @@ config.orchestration.Manager = 'openstack'
  *         file.
  * false - These values should be taken from auth catalog list
  *
-*****************************************************************************/
+ *****************************************************************************/
 config.serviceEndPointFromConfig = false;
 
 /****************************************************************************
@@ -42,7 +50,7 @@ config.serviceEndPointFromConfig = false;
  * NOTE: if config.serviceEndPointFromConfig is set as true, then this flag
  *       does not have any effect.
  *
-*****************************************************************************/
+ *****************************************************************************/
 config.serviceEndPointTakePublicURL = true;
 
 /****************************************************************************
@@ -77,7 +85,7 @@ config.serviceEndPointTakePublicURL = true;
  * ca:
  *      An authority certificate to check the remote host against,
  *      if you do not want to specify then use ''
-*****************************************************************************/
+ *****************************************************************************/
 config.networkManager = {};
 config.networkManager.ip = '127.0.0.1';
 config.networkManager.port = '9696'
@@ -112,7 +120,7 @@ config.identityManager.authProtocol = '<%=node['bcpc']['protocol']['keystone']%>
  * API versions will be used while using REST API to identityManager.
  * If want to use with default apiVersion(v2.0), then can specify it as
  * empty array.
-******************************************************************************/
+ ******************************************************************************/
 config.identityManager.apiVersion = ['v2.0'];
 config.identityManager.strictSSL = true;
 config.identityManager.ca = '/etc/ssl/certs/ssl-bcpc.pem';
@@ -141,6 +149,17 @@ config.analytics.authProtocol = 'http';
 config.analytics.strictSSL = false;
 config.analytics.ca = '';
 
+// vcenter related parameters
+config.vcenter = {};
+config.vcenter.server_ip = '127.0.0.1';         //vCenter IP
+config.vcenter.server_port = '443';             //Port
+config.vcenter.authProtocol = 'https';          //http or https
+config.vcenter.datacenter = 'vcenter';          //datacenter name
+config.vcenter.dvsswitch = 'vswitch';           //dvsswitch name
+config.vcenter.strictSSL = false;               //Validate the certificate or ignore
+config.vcenter.ca = '';                         //specify the certificate key file
+config.vcenter.wsdl = '/var/lib/contrail-webui/contrail-web-core/webroot/js/vim.wsdl';
+
 /* Discovery Service */
 config.discoveryService = {};
 config.discoveryService.server_ip = '<%=node['bcpc']['management']['vip']%>';
@@ -158,11 +177,6 @@ config.jobServer.server_port = '3000';
 /* Upload/Download Directory */
 config.files = {};
 config.files.download_path = '/tmp';
-
-/* Redis Server */
-config.redis = {};
-config.redis.server_port = '6379';
-config.redis.server_ip = '<%=node['bcpc']['management']['ip']%>';
 
 /* Cassandra Server */
 config.cassandra = {};
@@ -200,12 +214,13 @@ config.node_worker_count = 1;
 config.maxActiveJobs = 10;
 
 /* Redis DB index for Web-UI */
-config.redisDBIndex = 1;
+config.redisDBIndex = 3;
 
 /* WebUI Redis Server */
 config.redis_server_port = '6379';
 config.redis_server_ip = '<%=node['bcpc']['management']['ip']%>';
 config.redis_dump_file = '/var/lib/redis/dump-webui.rdb';
+config.redis_password = '';
 
 /* Cache Expiry Time */
 config.cacheExpire = {};
@@ -214,6 +229,9 @@ config.cacheExpire.topo_tree_time = 600; /* Seconds */
 
 /* Logo File: Use complete path of logo file location */
 config.logo_file = '/var/lib/contrail-webui/contrail-web-core/webroot/img/opencontrail-logo.png';
+
+/* Favicon File: Use complete path of favicon file location */
+config.favicon_file = '/var/lib/contrail-webui/contrail-web-core/webroot/img/opencontrail-favicon.ico';
 
 config.featurePkg = {};
 /* Add new feature Package Config details below */
@@ -226,7 +244,7 @@ config.qe = {};
 config.qe.enable_stat_queries = false;
 
 /* Configure level of logs, supported log levels are:
-   debug, info, notice, warning, error, crit, alert, emerg
+ debug, info, notice, warning, error, crit, alert, emerg
  */
 config.logs = {};
 config.logs.level = 'debug';
@@ -239,14 +257,14 @@ config.logs.level = 'debug';
  *      - false, then project list will come from Identity Manager
  * Default: false
  *
-******************************************************************************/
+ ******************************************************************************/
 config.getDomainProjectsFromApiServer = false;
 /*****************************************************************************
-* Boolean flag L2_enable indicates the default forwarding-mode of a network.
-* Allowed values : true / false
-* Set this flag to true if all the networks are to be L2 networks,
-* set to false otherwise.
-*****************************************************************************/
+ * Boolean flag L2_enable indicates the default forwarding-mode of a network.
+ * Allowed values : true / false
+ * Set this flag to true if all the networks are to be L2 networks,
+ * set to false otherwise.
+ *****************************************************************************/
 config.network = {};
 config.network.L2_enable = false;
 
@@ -261,7 +279,7 @@ config.network.L2_enable = false;
  *       does not have any effect, in that case the domain list is retrieved
  *       from API Server.
  *
-*****************************************************************************/
+ *****************************************************************************/
 config.getDomainsFromApiServer = false;
 
 // Export this as a module.
