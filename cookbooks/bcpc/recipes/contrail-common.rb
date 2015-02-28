@@ -34,6 +34,22 @@ apt_repository "contrail-2.0" do
     key "contrail.key"
 end
 
+# Install dependency for supervisor package
+package "python-meld3"
+
+# Install updated supervisor package
+cookbook_file "/tmp/supervisor_3.1.3_all.deb" do
+    source "bins/supervisor_3.1.3_all.deb"
+    owner "root"
+    mode 00444
+end
+
+package "supervisor_3.1.3_all.deb" do
+    provider Chef::Provider::Package::Dpkg
+    source "/tmp/supervisor_3.1.3_all.deb"
+    action :install
+end
+
 template "/usr/local/bin/hup_contrail" do
     source "hup_contrail.erb"
     mode 0755

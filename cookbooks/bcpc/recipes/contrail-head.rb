@@ -50,26 +50,11 @@ end
         user "root"
         code "sed --in-place '/^process_name.*/d' /etc/contrail/supervisord_config_files/#{file}.ini"
         only_if "grep process_name /etc/contrail/supervisord_config_files/#{file}.ini"
+        notifies :restart, "service[supervisor-config]", :immediately
     end
 end
 
-# Install updated supervisor package
-cookbook_file "/tmp/supervisor_3.1.3_all.deb" do
-    source "bins/supervisor_3.1.3_all.deb"
-    owner "root"
-    mode 00444
-end
-
-package "supervisor_3.1.3_all.deb" do
-    provider Chef::Provider::Package::Dpkg
-    source "/tmp/supervisor_3.1.3_all.deb"
-    action :install
-    notifies :restart, "service[supervisor-config]", :immediately
-    notifies :restart, "service[supervisor-control]", :immediately
-    notifies :restart, "service[supervisor-analytics]", :immediately
-end
-
-# Workaround for disabled SSLv3 in java (only needed for contrail 1.20, fixed upstream)
+# Workaround for disabled SSLv3 in java (needed to run ifmap-server correctly)
 bash "fix-java-ssl" do
     user "root"
     code <<-EOH
