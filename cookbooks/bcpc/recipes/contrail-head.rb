@@ -51,6 +51,8 @@ end
         code "sed --in-place '/^process_name.*/d' /etc/contrail/supervisord_config_files/#{file}.ini"
         only_if "grep process_name /etc/contrail/supervisord_config_files/#{file}.ini"
         notifies :restart, "service[supervisor-config]", :immediately
+        notifies :restart, "service[supervisor-control]", :immediately
+        notifies :restart, "service[supervisor-analytics]", :immediately
     end
 end
 
@@ -95,6 +97,7 @@ end
 %w{ contrail-discovery
     contrail-control
     contrail-api
+    contrail-dns
     contrail-schema
     contrail-svc-monitor
     contrail-analytics-api
@@ -108,16 +111,10 @@ end
         mode 00640
         variables(:servers => get_head_nodes)
         notifies :restart, "service[#{pkg}]", :immediately
+        if pkg == "contrail-dns" then
+            notifies :restart, "service[contrail-named]", :immediately
+        end
     end
-end
-
-template "/etc/contrail/dns.conf" do
-    source "contrail-dns.conf.erb"
-    owner "contrail"
-    group "contrail"
-    mode 00640
-    notifies :restart, "service[contrail-dns]", :immediately
-    notifies :restart, "service[contrail-named]", :immediately
 end
 
 template "/var/lib/contrail-webui/contrail-web-core/keys/cs-cert.pem" do
