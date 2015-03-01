@@ -228,7 +228,7 @@ bash "provision-encap" do
 end
 
 get_all_nodes.each do |server|
-    bash "provision-vrouter" do
+    bash "provision-vrouter-#{server['hostname']}" do
         user "root"
         code <<-EOH
             contrail-provision-vrouter \

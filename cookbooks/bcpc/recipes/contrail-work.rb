@@ -64,6 +64,7 @@ template "/etc/contrail/contrail-vrouter-agent.conf" do
     owner "contrail"
     group "contrail"
     mode 00644
+    variables(:servers => get_head_nodes)
     notifies :restart, "service[contrail-vrouter-agent]", :immediately
 end
 
