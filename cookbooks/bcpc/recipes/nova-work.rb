@@ -88,6 +88,20 @@ end
 #    not_if "test -f /usr/lib/python2.7/dist-packages/nova/nova-sql.patch"
 #end
 
+template "/etc/nova/ssl-bcpc.pem" do
+    source "ssl-bcpc.pem.erb"
+    owner "nova"
+    group "nova"
+    mode 00644
+end
+
+template "/etc/nova/ssl-bcpc.key" do
+    source "ssl-bcpc.key.erb"
+    owner "nova"
+    group "nova"
+    mode 00600
+end
+
 directory "/var/lib/nova/.ssh" do
     owner "nova"
     group "nova"

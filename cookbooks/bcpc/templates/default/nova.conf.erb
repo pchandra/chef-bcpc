@@ -85,8 +85,11 @@ libvirt_inject_partition=-2
 libvirt_live_migration_flag="VIR_MIGRATE_UNDEFINE_SOURCE,VIR_MIGRATE_PEER2PEER,VIR_MIGRATE_LIVE,VIR_MIGRATE_PERSIST_DEST"
 
 # Nova VNC settings
+ssl_only=True
+key=/etc/nova/ssl-bcpc.key
+cert=/etc/nova/ssl-bcpc.pem
 novnc_enabled=True
-novncproxy_base_url=http://<%=node['bcpc']['management']['ip']%>:6080/vnc_auto.html
+novncproxy_base_url=https://<%=node['bcpc']['management']['ip']%>:6080/vnc_auto.html
 vncserver_proxyclient_address=127.0.0.1
 novncproxy_host=<%=node['bcpc']['management']['ip']%>
 memcached_servers=<%=node['bcpc']['management']['vip']%>:11211

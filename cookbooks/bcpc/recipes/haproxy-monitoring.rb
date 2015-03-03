@@ -24,8 +24,7 @@ template "/etc/haproxy/haproxy.cfg" do
     source "haproxy-monitoring.cfg.erb"
     mode 00644
     variables(
-        :mysql_servers => search_nodes("recipe", "mysql-monitoring"),
-        :graphite_servers => search_nodes("recipe", "graphite")
+        :servers => search_nodes("role", "BCPC-Monitoring")
     )
     notifies :restart, "service[haproxy]", :immediately
 end

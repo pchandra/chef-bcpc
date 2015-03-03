@@ -219,7 +219,7 @@
 
 <match bcpc.**>
     type elasticsearch
-    host <%=node['bcpc']['management']['vip']%>
+    host <%=node['bcpc']['management']['monitoring']['vip']%>
     port 9200
     logstash_format true
     include_tag_key true

@@ -45,10 +45,13 @@
     rgw enable ops log = false
     rgw enable usage log = false
     debug rgw = 0/0
+
+<% if config_defined('keystone-admin-token') %>
     rgw keystone url = <%=node['bcpc']['management']['vip']%>:35358
     rgw keystone admin token = <%=get_config('keystone-admin-token')%>
     rgw keystone accepted roles = admin Member _member_
     rgw keystone token cache size = 1000
     rgw keystone revocation interval = 1200
     rgw s3 auth use keystone = true
+<% end %>
     rgw dns name = s3.<%=node['bcpc']['domain_name'] %>

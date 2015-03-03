@@ -62,6 +62,13 @@ def make_config(key, value)
     end
 end
 
+def config_defined(key)
+    init_config if $dbi.nil?
+    puts "------------ Checking if key \"#{key}\" is defined"
+    result = (node['bcpc']['enabled']['encrypt_data_bag']) ? $edbi[key] : $dbi[key]
+    return !result.nil?
+end
+
 def get_config(key)
     init_config if $dbi.nil?
     puts "------------ Fetching value for key \"#{key}\""

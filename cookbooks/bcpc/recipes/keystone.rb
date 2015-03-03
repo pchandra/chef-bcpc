@@ -38,8 +38,10 @@ ruby_block "initialize-keystone-config" do
     end
 end
 
-package "keystone" do
-    action :upgrade
+%w{keystone memcached}.each do |pkg|
+    package pkg do
+        action :upgrade
+    end
 end
 
 template "/etc/keystone/keystone.conf" do

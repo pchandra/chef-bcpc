@@ -81,20 +81,18 @@ listen keystone-api
   <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:5000 check inter 5s rise 1 fall 1" %>
 <% end -%>
 
-listen keystone-admin
+frontend keystone-admin
   bind <%=node['bcpc']['management']['vip']%>:35357 <%= (node['bcpc']['protocol']['keystone'] == 'https') ? "ssl crt /etc/haproxy/haproxy.pem" : "" %>
-  balance source
   option tcplog
-  option httpchk GET /
-  http-check expect status 300
-<% @servers.each do |server| -%>
-  <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:35357 check inter 5s rise 1 fall 1" %>
-<% end -%>
+  default_backend keystone-admin-backend
 
-listen keystone-admin-http
+frontend keystone-admin-httponly
   bind <%=node['bcpc']['management']['vip']%>:35358
-  balance source
   option tcplog
+  default_backend keystone-admin-backend
+
+backend keystone-admin-backend
+  balance source
   option httpchk GET /
   http-check expect status 300
 <% @servers.each do |server| -%>
@@ -247,8 +245,6 @@ frontend https
   use_backend horizon-backend if url_horizon_static
   acl url_rabbitmq path_beg /rabbitmq
   use_backend rabbitmq-web-backend if url_rabbitmq
-  acl url_kibana path_beg /kibana
-  use_backend kibana-backend if url_kibana
   acl url_zabbix path_beg /zabbix
   use_backend zabbix-backend if url_zabbix
   default_backend http-backend
@@ -278,15 +274,6 @@ backend rabbitmq-web-backend
   <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:55672 check inter 5s rise 1 fall 1" %>
 <% end -%>
 
-backend kibana-backend
-  balance source
-  option httpchk GET /
-  http-check expect status 200
-  reqrep ^([^\ :]*)\ /kibana/(.*) \1\ /\2
-<% @servers.each do |server| -%>
-  <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:5601 check inter 5s rise 1 fall 1" %>
-<% end -%>
-
 backend zabbix-backend
   balance source
   option httpchk GET /
@@ -294,15 +281,6 @@ backend zabbix-backend
   reqrep ^([^\ :]*)\ /zabbix/(.*) \1\ /\2
 <% @servers.each do |server| -%>
   <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:7777 check inter 5s rise 1 fall 1" %>
-<% end -%>
-
-listen elasticsearch <%=node['bcpc']['management']['vip']%>:9200
-  balance source
-  option tcplog
-  option httpchk GET /
-  http-check expect status 200
-<% @servers.each do |server| -%>
-  <%= "server #{server['hostname']} #{server['bcpc']['management']['ip']}:9200 check inter 5s rise 1 fall 1" %>
 <% end -%>
 
 frontend radosgw-http

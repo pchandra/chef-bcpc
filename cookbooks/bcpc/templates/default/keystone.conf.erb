@@ -534,31 +534,31 @@ log_dir = /var/log/keystone
 # cache region. This should not need to be changed unless
 # there is another dogpile.cache region with the same
 # configuration name. (string value)
-#config_prefix=cache.keystone
+config_prefix=cache.keystone
 
 # Default TTL, in seconds, for any cached item in the
 # dogpile.cache region. This applies to any cached method that
 # doesn't have an explicit cache expiration time defined for
 # it. (integer value)
-#expiration_time=600
+expiration_time=3600
 
 # Dogpile.cache backend module. It is recommended that
 # Memcache (dogpile.cache.memcache) or Redis
 # (dogpile.cache.redis) be used in production deployments.
 # Small workloads (single process) like devstack can use the
 # dogpile.cache.memory backend. (string value)
-#backend=keystone.common.cache.noop
+backend=dogpile.cache.memcached
 
 # Use a key-mangling function (sha1) to ensure fixed length
 # cache-keys. This is toggle-able for debugging purposes, it
 # is highly recommended to always leave this set to True.
 # (boolean value)
-#use_key_mangler=true
+use_key_mangler=true
 
 # Arguments supplied to the backend module. Specify this
 # option once per argument to be passed to the dogpile.cache
 # backend. Example format: "<argname>:<value>". (multi valued)
-#backend_argument=
+backend_argument=url:<%=@node["bcpc"]["management"]["vip"]%>:11211
 
 # Proxy Classes to import that will affect the way the
 # dogpile.cache backend functions. See the dogpile.cache
@@ -569,14 +569,14 @@ log_dir = /var/log/keystone
 
 # Global toggle for all caching using the should_cache_fn
 # mechanism. (boolean value)
-#enabled=false
+enabled=true
 
 # Extra debugging from the cache backend (cache keys,
 # get/set/delete/etc calls) This is only really useful if you
 # need to see the specific cache-backend get/set/delete calls
 # with the keys/values.  Typically this should be left set to
 # False. (boolean value)
-#debug_cache_backend=false
+debug_cache_backend=false
 
 
 [catalog]
@@ -1292,7 +1292,7 @@ ca_certs = /etc/keystone/cert.pem
 
 # Amount of time a token should remain valid (in seconds).
 # (integer value)
-#expiration=3600
+expiration=3600
 
 # Controls the token construction, validation, and revocation
 # operations. Core providers are
@@ -1301,11 +1301,11 @@ ca_certs = /etc/keystone/cert.pem
 provider = keystone.token.providers.pki.Provider
 
 # Keystone Token persistence backend driver. (string value)
-#driver=keystone.token.backends.sql.Token
+driver=keystone.token.backends.memcache.Token
 
 # Toggle for token system cacheing. This has no effect unless
 # global caching is enabled. (boolean value)
-#caching=true
+caching=true
 
 # Time to cache the revocation list and the revocation events
 # if revoke extension is enabled (in seconds). This has no
@@ -1315,7 +1315,7 @@ provider = keystone.token.providers.pki.Provider
 
 # Time to cache tokens (in seconds). This has no effect unless
 # global and token caching are enabled. (integer value)
-#cache_time=<None>
+cache_time=3600
 
 # Revoke token by token identifier.  Setting revoke_by_id to
 # True enables various forms of enumerating tokens, e.g. `list

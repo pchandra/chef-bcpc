@@ -37,7 +37,7 @@ function (Settings) {
      *  +elasticsearch: {server: "http://localhost:9200", withCredentials: true}+
      *
      */
-    elasticsearch: 'http://<%=node['bcpc']['management']['vip']%>:9200',
+    elasticsearch: 'https://<%=node['bcpc']['management']['monitoring']['vip']%>/elasticsearch',
 
     /** @scratch /configuration/config.js/5
      *

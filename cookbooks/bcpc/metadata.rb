@@ -1,10 +1,10 @@
 name             "bcpc"
 maintainer       "Bloomberg Finance L.P."
-maintainer_email "pchandra7@bloomberg.net"
+maintainer_email "bcpc@bloomberg.net"
 license          "Apache License 2.0"
 description      "Installs/Configures Bloomberg Clustered Private Cloud (BCPC)"
 long_description IO.read(File.join(File.dirname(__FILE__), 'README.md'))
-version          "0.5.0"
+version          IO.read(File.join(File.dirname(__FILE__), '.version'))
 
 depends "apt", ">= 1.9.2"
 depends "ubuntu", ">= 1.1.2"

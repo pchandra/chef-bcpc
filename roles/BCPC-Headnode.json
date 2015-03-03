@@ -29,8 +29,6 @@
       "recipe[bcpc::nova-head]",
       "recipe[bcpc::heat]",
       "recipe[bcpc::horizon]",
-      "recipe[bcpc::elasticsearch]",
-      "recipe[bcpc::kibana]",
       "role[BCPC-Worknode]",
       "recipe[bcpc::checks-head]"
     ],
