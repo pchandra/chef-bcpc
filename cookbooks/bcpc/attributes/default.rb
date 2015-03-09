@@ -114,7 +114,6 @@ default['bcpc']['ceph']['rebalance'] = false
 #  Network settings for the cluster
 #
 ###########################################
-default['bcpc']['management']['anycast'] = "10.0.99.1"
 default['bcpc']['management']['vip'] = "10.17.1.15"
 default['bcpc']['management']['netmask'] = "255.255.255.0"
 default['bcpc']['management']['cidr'] = "10.17.1.0/24"
@@ -139,6 +138,7 @@ default['bcpc']['floating']['vip'] = "192.168.43.15"
 default['bcpc']['floating']['netmask'] = "255.255.255.0"
 default['bcpc']['floating']['cidr'] = "192.168.43.0/24"
 default['bcpc']['floating']['gateway'] = "192.168.43.2"
+default['bcpc']['floating']['anycast'] = "10.0.99.1"
 default['bcpc']['floating']['available_subnet'] = "192.168.43.128/25"
 default['bcpc']['floating']['interface'] = nil
 # if 'interface' is a VLAN interface, specifying a parent allows MTUs

@@ -9,15 +9,15 @@ password <%="#{get_config('quagga-bgpd-password')}"%>
 log file /var/log/quagga/bgpd.log
 !
 router bgp <%="#{node['bcpc']['bgp']['asn']}"%>
-bgp router-id <%="#{node['bcpc']['management']['ip']}"%>
-network <%="#{node['bcpc']['management']['anycast']}"%>/32
+bgp router-id <%="#{node['bcpc']['floating']['ip']}"%>
+network <%="#{node['bcpc']['floating']['anycast']}"%>/32
 timers bgp 4 16
 neighbor <%="#{node['bcpc']['bgp']['peer_ip']}"%> remote-as <%="#{node['bcpc']['bgp']['peer_asn']}"%>
 neighbor <%="#{node['bcpc']['bgp']['peer_ip']}"%> next-hop-self
 neighbor <%="#{node['bcpc']['bgp']['peer_ip']}"%> prefix-list DEFAULT in
 neighbor <%="#{node['bcpc']['bgp']['peer_ip']}"%> prefix-list ANYCAST out
 !
-ip prefix-list ANYCAST seq 5 permit <%="#{node['bcpc']['management']['anycast']}"%>/32
+ip prefix-list ANYCAST seq 5 permit <%="#{node['bcpc']['floating']['anycast']}"%>/32
 ip prefix-list DEFAULT seq 5 permit 0.0.0.0/0
 line vty
 !

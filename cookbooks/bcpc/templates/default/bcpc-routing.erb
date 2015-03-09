@@ -43,6 +43,18 @@ ip rule del pref 200
 ip rule add from <%=@node["bcpc"]["fixed"]["cidr"]%> to <%=@node["bcpc"]["management"]["cidr"]%> pref 100 table main
 ip rule add from <%=@node["bcpc"]["fixed"]["cidr"]%> to <%=@node["bcpc"]["storage"]["cidr"]%> pref 200 table main
 
+# Let traffic to/from the anycast address route via the main table
+ip rule del pref 8000
+ip rule del pref 8001
+ip rule add from <%=@node["bcpc"]["floating"]["anycast"]%> pref 8000 table main
+ip rule add to <%=@node["bcpc"]["floating"]["anycast"]%> pref 8001 table main
+
+# Let traffic to/from the float network route via the main table
+ip rule del pref 8500
+ip rule del pref 8501
+ip rule add from <%=@node["bcpc"]["floating"]["cidr"]%> pref 8500 table main
+ip rule add to <%=@node["bcpc"]["floating"]["cidr"]%> pref 8501 table main
+
 # Let traffic to/from fixed IPs route via main table
 ip rule del pref 9000
 ip rule del pref 9001

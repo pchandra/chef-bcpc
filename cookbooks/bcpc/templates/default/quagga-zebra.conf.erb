@@ -10,8 +10,8 @@ enable password <%="#{get_config('quagga-zebra-password')}"%>
 log file /var/log/quagga/zebra.log
 !log syslog
 !
-interface <%="#{node['bcpc']['management']['interface']}"%>
-  ip address <%="#{node['bcpc']['management']['ip']}/#{(node['bcpc']['management']['cidr'].match /\d+\.\d+\.\d+\.\d+\/(\d+)/)[1]}"%>
+interface <%="#{node['bcpc']['floating']['interface']}"%>
+  ip address <%="#{node['bcpc']['floating']['ip']}/#{(node['bcpc']['floating']['cidr'].match /\d+\.\d+\.\d+\.\d+\/(\d+)/)[1]}"%>
 !
 interface lo
 !
