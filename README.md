@@ -133,12 +133,13 @@ BCPC currently relies upon a number of open-source packages:
  - [HAProxy](http://haproxy.1wt.eu/)
  - [Keepalived](http://www.keepalived.org/)
  - [Kibana](http://kibana.org/)
+ - [Memcached](http://memcached.org)
  - [OpenStack](http://www.openstack.org/)
  - [Percona XtraDB Cluster](http://www.percona.com/software/percona-xtradb-cluster)
  - [PowerDNS](https://www.powerdns.com/)
  - [RabbitMQ](http://www.rabbitmq.com/)
  - [Ubuntu](http://www.ubuntu.com/)
- - [Vagrant](http://www.vagrantup.com/) - Verified with version 1.2.2
+ - [Vagrant](http://www.vagrantup.com/) - Verified with version 1.7.2
  - [VirtualBox](https://www.virtualbox.org/) - >= 4.3.x supported
  - [Zabbix](http://www.zabbix.com/)
 

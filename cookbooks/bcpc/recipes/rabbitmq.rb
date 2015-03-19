@@ -42,7 +42,7 @@ end
 template "/var/lib/rabbitmq/.erlang.cookie" do
     source "erlang.cookie.erb"
     mode 00400
-    notifies :restart, "service[rabbitmq-server]", :delayed
+    notifies :restart, "service[rabbitmq-server]", :immediately
 end
 
 template "/etc/rabbitmq/rabbitmq-env.conf" do
@@ -70,33 +70,25 @@ end
 template "/etc/rabbitmq/rabbitmq.conf.d/bcpc.conf" do
     source "rabbitmq-bcpc.conf.erb"
     mode 00644
-    notifies :restart, "service[rabbitmq-server]", :delayed
+    notifies :restart, "service[rabbitmq-server]", :immediately
 end
 
 template "/etc/rabbitmq/rabbitmq.config" do
     source "rabbitmq.config.erb"
     mode 00644
-    notifies :restart, "service[rabbitmq-server]", :delayed
+    notifies :restart, "service[rabbitmq-server]", :immediately
 end
 
 execute "enable-rabbitmq-web-mgmt" do
-    command "/usr/lib/rabbitmq/bin/rabbitmq-plugins enable rabbitmq_management"
-    not_if "/usr/lib/rabbitmq/bin/rabbitmq-plugins list -e | grep rabbitmq_management"
+    command "/usr/sbin/rabbitmq-plugins enable rabbitmq_management"
+    not_if "/usr/sbin/rabbitmq-plugins list -m -e | grep '^rabbitmq_management$'"
     notifies :restart, "service[rabbitmq-server]", :delayed
-end
-
-bash "rabbitmq-stop" do
-    user "root"
-    action :nothing
-    code <<-EOH
-        service rabbitmq-server stop
-        epmd -kill
-    EOH
 end
 
 service "rabbitmq-server" do
     stop_command "service rabbitmq-server stop && epmd -kill"
-    action [:enable, :start]
+    action [:enable]
+    supports :status => true
 end
 
 get_head_nodes.each do |server|

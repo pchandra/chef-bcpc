@@ -91,7 +91,7 @@ def search_nodes(key, value)
 end
 
 def get_all_nodes
-    results = search(:node, "recipes:bcpc\\:\\:default AND chef_environment:#{node.chef_environment}")
+    results = search(:node, "recipes:bcpc AND chef_environment:#{node.chef_environment}")
     if results.any? { |x| x['hostname'] == node['hostname'] }
         results.map! { |x| x['hostname'] == node['hostname'] ? node : x }
     else

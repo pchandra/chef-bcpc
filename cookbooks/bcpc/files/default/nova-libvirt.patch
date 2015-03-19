@@ -107,8 +107,8 @@ index 32ab334..470f6de 100644
          :param context: security context
 @@ -4794,8 +4821,9 @@ class ComputeManager(manager.Manager):
          #             from remote volumes if necessary
-         block_device_info = self._get_instance_volume_block_device_info(
-                             context, instance)
+         block_device_info = self._get_instance_block_device_info(context,
+                                                                  instance)
 -        self.driver.rollback_live_migration_at_destination(context, instance,
 -                        network_info, block_device_info)
 +        self.driver.rollback_live_migration_at_destination(
@@ -249,8 +249,9 @@ index be8c393..35cd764 100644
          self.mox.StubOutWithMock(self.compute.driver,
                                   'rollback_live_migration_at_destination')
          self.compute.driver.rollback_live_migration_at_destination(c,
--                instance, [], {'block_device_mapping': []})
-+                instance, [], {'block_device_mapping': []},
+                 instance, [], {'swap': None, 'ephemerals': [],
+-                               'block_device_mapping': []})
++                               'block_device_mapping': []},
 +                destroy_disks=True, migrate_data=None)
  
          # start test

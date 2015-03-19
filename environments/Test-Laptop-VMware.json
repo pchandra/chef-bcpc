@@ -11,6 +11,10 @@
         "ssd_disks" : [ "sdd", "sde" ],
         "chooseleaf" : "host"
       },
+      "nova" : {
+        "ram_allocation_ratio" : "20.0",
+        "cpu_allocation_ratio": "20.0"
+      },
       "domain_name" : "bcpc.example.com",
       "management": {
         "vip" : "10.0.100.5",
